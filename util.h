@@ -12,48 +12,31 @@ SdFile file;
 #define NAMELEN 32
 #define VALUELEN 32
 
-void stylesCss(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
-{
-    URLPARAM_RESULT rc;
-    char name[NAMELEN];
-    int  name_len;
-    char value[VALUELEN];
-    int value_len;
-    server.httpSuccess();
+/**
+* Gravando dados na EEPROM
+*/
+void eepromWriteString( int position, char string[8] ) {
+    int i = 0;
+    char c;
 
-    if ( type == WebServer::GET ) {
-        if( strlen(url_tail) ) {
-            while (strlen(url_tail)) {
-                rc = server.nextURLparam(&url_tail, name, NAMELEN, value, VALUELEN);
-                if (rc == URLPARAM_EOS)
-                    server.println("<hr />");
-                else {
-                    server.print(name);
-                    server.println(" = ");
-                    server.print(value);
-                }
-            }
-        }
+    for ( i=0; i < 8; i++ ) {
+        c = string[i];
+        EEPROM.write(position++, c);
+        //Serial.println(string[i]);
+    }
+    EEPROM.write(position, '\0');
+}
 
+/**
+* Lendo dados na EEPROM
+*/
+void eepromReadString( int position, char string[8] ) {
+    int count = 8;
+    int i = 0;
+    //char string[8];
 
-        if (! file.open(&root, "styles.css", O_READ)) {
-            server.println("HTTP/1.1 404 Not Found");
-            server.println("Content-Type: text/html");
-            server.println();
-            server.println("<h2>File Not Found!</h2>");
-        } else {
-            server.println("Content-Type: text/plain");
-        }
-
-        int16_t c;
-        while ((c = file.read()) > 0) {
-            server.print((char)c);
-        }
-        file.close();
-
-        server.print("<h1>FILENAME");
-        server.print(url_tail);
-        server.println("</h1>");
+    for ( i=0; i < count; i++ ) {
+        string[i] = EEPROM.read(position++);
     }
 }
 
@@ -98,6 +81,14 @@ void loadHTMLPage(WebServer &server, WebServer::ConnectionType type, char *url_t
 
         server.print("<h1>FILENAME");
         server.print(url_tail);
+        server.println("</h1>");
+
+        // Salvando string
+        //eepromWriteString(2, "almir");
+        char nome[8] = {};
+        eepromReadString(2, nome);
+        server.println("<h1>");
+        server.println(nome);
         server.println("</h1>");
     }
 }
