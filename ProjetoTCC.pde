@@ -51,7 +51,6 @@ void setup()
      * default page name */
     //webserver.addCommand("index.html", &helloCmd);
     webserver.addCommand("config", &helloCmd);
-    webserver.addCommand("stylescss", &stylesCss);
 
     Serial.begin(9600);
 
