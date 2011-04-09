@@ -6,19 +6,7 @@
 // Biblioteca util
 #include "util.h"
 
-#define error(s) error_P(PSTR(s))
 
-void error_P(const char* str) {
-    PgmPrint("error: ");
-    SerialPrintln_P(str);
-    if (card.errorCode()) {
-        PgmPrint("SD error: ");
-        Serial.print(card.errorCode(), HEX);
-        Serial.print(',');
-        Serial.println(card.errorData(), HEX);
-    }
-    while(1);
-}
 
 
 /* CHANGE THIS TO YOUR OWN UNIQUE VALUE.  The MAC number should be
@@ -46,6 +34,11 @@ void setup()
     /* setup our default command that will be run when the user accesses
      * the root page on the server */
     webserver.setDefaultCommand(&loadHTMLPage);
+
+    // Setting user and password
+    char nome[8] = {};
+    eepromReadString(2, nome);
+    webserver.setAuthentication("admin", nome);
 
     /* run the same command if you try to load /index.html, a common
      * default page name */

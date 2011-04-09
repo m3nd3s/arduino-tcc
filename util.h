@@ -12,6 +12,20 @@ SdFile file;
 #define NAMELEN 32
 #define VALUELEN 32
 
+#define error(s) error_P(PSTR(s))
+
+void error_P(const char* str) {
+    PgmPrint("error: ");
+    SerialPrintln_P(str);
+    if (card.errorCode()) {
+        PgmPrint("SD error: ");
+        Serial.print(card.errorCode(), HEX);
+        Serial.print(',');
+        Serial.println(card.errorData(), HEX);
+    }
+    while(1);
+}
+
 /**
 * Gravando dados na EEPROM
 */
