@@ -52,11 +52,44 @@ void indexHTML(WebServer &server, WebServer::ConnectionType type, char *url_tail
         server.println("<h2>File Not Found!</h2>");
     }
 
-    int16_t c;
+    char c;
     while ((c = file.read()) > 0) {
-        server.print((char)c);
+        server.print(c);
     }
     file.close();
+}
+
+void configHTML(WebServerAuth &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) {
+    server.httpSuccess();
+
+    // Se POST configura a senha
+    if( type == WebServer::POST ) {
+        char value[16], name[16];
+        server.readPOSTparam(name, 16, value, 16);
+        int valor = strtoul(value, NULL, 10);
+
+        eepromWriteString(0, value);
+        server.setAuthentication("admin", value);
+    }
+
+    // Lendo o arquivo index.html disco
+    if (! file.open(&root, "config.htm", O_READ)) {
+        server.println("HTTP/1.1 404 Not Found");
+        server.println("Content-Type: text/html");
+        server.println();
+        server.println("<h2>File Not Found!</h2>");
+    }
+
+    char c;
+    while ((c = file.read()) > 0) {
+        server.print(c);
+    }
+    file.close();
+}
+
+void logout(WebServerAuth &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) {
+    server.httpSuccess();
+    server.httpAuthFail();
 }
 
 //void loadHTMLPage(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
