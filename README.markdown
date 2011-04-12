@@ -6,6 +6,8 @@ Implementação de um sistema web para monitoramento de ambientes climatizados.
 ## Links
 *  [Projeto Arduino](http://arduino.cc/en)
 *  [Projeto Webduino](http://code.google.com/p/webduino/)
+*  [Dallas Temperature Control Library](http://www.milesburton.com/?title=Dallas_Temperature_Control_Library)
+*  [Tutorial Sensor de Temperatura](http://www.synbio.org.uk/instrumentation-news/1484.html) 
 
 ## Contatos
 m3nd3s@gmail.com
