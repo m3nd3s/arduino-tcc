@@ -41,6 +41,54 @@ void eepromReadString( int position, char string[8] ) {
     }
 }
 
+String getTemperatureAndTime()
+{
+  sensors.requestTemperatures(); // Send the command to get temperatures
+  
+  //Serial.println(temp);
+  
+  /* Get the current time and date from the chip */
+  Time t = rtc.time();
+
+  /* Name the day of the week */
+  memset(day, 0, sizeof(day));  /* clear day buffer */
+  switch (t.day) {
+    case 1:
+      strcpy(day, "Sunday");
+      break;
+    case 2:
+      strcpy(day, "Monday");
+      break;
+    case 3:
+      strcpy(day, "Tuesday");
+      break;
+    case 4:
+      strcpy(day, "Wednesday");
+      break;
+    case 5:
+      strcpy(day, "Thursday");
+      break;
+    case 6:
+      strcpy(day, "Friday");
+      break;
+    case 7:
+      strcpy(day, "Saturday");
+      break;
+  }
+
+  float temp = sensors.getTempCByIndex(0);
+  int dec = (temp - ((int)temp)) * 100;
+  Serial.println(dec);
+  /* Format the time and date and insert into the temporary buffer */
+  snprintf(buf, sizeof(buf), "%s %04d-%02d-%02d %02d:%02d:%02d %02d.%d",
+           day,
+           t.yr, t.mon, t.date,
+           t.hr, t.min, t.sec, (int) temp, dec);
+
+  /* Print the formatted string to serial so we can see the time */
+  return buf;
+}
+
 void indexHTML(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) {
     server.httpSuccess();
 
@@ -51,15 +99,37 @@ void indexHTML(WebServer &server, WebServer::ConnectionType type, char *url_tail
         server.println();
         server.println("<h2>File Not Found!</h2>");
     }
-
+    String marker = "";
+    boolean key = false;
     char c;
     while ((c = file.read()) > 0) {
+      if ( c == '{' ) key = true;
+      if (key) 
+        marker += String(c);
+      else
         server.print(c);
+      if ( c == '}' ) {
+        key = false;
+        
+        if ( marker.equals("{temp}") )
+          server.print(getTemperatureAndTime());
+        else
+          server.print(marker);
+        
+        marker = "";
+      }
+      
+      //server.print(c);
     }
     file.close();
+    //server.print(getTemperatureAndTime());
+    //String novo_html = html.replace("{temp}", getTemperatureAndTime());
+    //server.print(, temp_and_time));  
+    //server.print(html);
+    //Serial.print(html);
 }
 
-void configHTML(WebServerAuth &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) {
+void configHTML(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) {
     server.httpSuccess();
 
     // Se POST configura a senha
@@ -69,7 +139,7 @@ void configHTML(WebServerAuth &server, WebServer::ConnectionType type, char *url
         int valor = strtoul(value, NULL, 10);
 
         eepromWriteString(0, value);
-        server.setAuthentication("admin", value);
+        //server.setAuthentication("admin", value);
     }
 
     // Lendo o arquivo index.html disco
@@ -87,10 +157,12 @@ void configHTML(WebServerAuth &server, WebServer::ConnectionType type, char *url
     file.close();
 }
 
-void logout(WebServerAuth &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) {
+
+
+/*void logout(WebServerAuth &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) {
     server.httpSuccess();
     server.httpAuthFail();
-}
+}*/
 
 //void loadHTMLPage(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
 //{

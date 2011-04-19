@@ -1,8 +1,14 @@
 #include "Ethernet.h"
+#include "SPI.h"
 #include "WebServerAuth.h"
 #include <EEPROM.h>
-#include <SdFat.h>
-#include <SdFatUtil.h>
+#include <SD.h>
+#include <string.h>
+
+#include <stdio.h>
+#include <DS1302.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 #include "config.h" // Configurações e variáveis globais
 #include "lib.h" // Funções
@@ -15,11 +21,13 @@
 WebServerAuth webserver("admin", "admin", PREFIX, 80);
 
 void setup() {
+    Serial.begin(9600);
     Ethernet.begin(mac, ip);
+    sensors.begin();
 
     char nome[8] = {};
     eepromReadString(0, nome);
-    webserver.setAuthentication("admin", nome);
+    //webserver.setAuthentication("admin", nome);
 
     // Configuração necessária para leitura do microSD card
     pinMode(10, OUTPUT);
@@ -35,10 +43,23 @@ void setup() {
     // Configurando comandos
     webserver.setDefaultCommand(&indexHTML);
     webserver.addCommand("config", &configHTML);
-    webserver.addCommand("logout", &logout);
+    //webserver.addCommand("logout", &logout);
 
     // Inicializando o servidor Web
     webserver.begin();
+    
+    /* Initialize a new chip by turning off write protection and clearing the
+     clock halt flag. These methods needn't always be called. See the DS1302
+     datasheet for details. */
+    rtc.write_protect(false);
+    rtc.halt(false);
+  
+    /* Make a new time object to set the date and time */
+    /*   Tuesday, May 19, 2009 at 21:16:37.            */
+    Time t(2011, 4, 15, 20, 17, 17, 6);
+  
+    /* Set the time and date on the chip */
+    rtc.time(t);
 }
 
 void loop(){
