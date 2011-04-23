@@ -3,6 +3,9 @@
 ## Descrição
 Implementação de um sistema web para monitoramento de ambientes climatizados. 
 
+Os arquivos que estão presentes na nasta sd/ devem ser copiados para o micro SD Card mantendo-se a estrutura atual.
+Não é necessário copiar a pasta sd/
+
 ## Links
 *  [Projeto Arduino](http://arduino.cc/en)
 *  [Projeto Webduino](http://code.google.com/p/webduino/)
