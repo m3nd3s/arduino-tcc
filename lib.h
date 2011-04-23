@@ -108,7 +108,7 @@ void indexHTML(WebServer &server, WebServer::ConnectionType type, char *url_tail
         marker += String(c);
       else
         server.print(c);
-      if ( c == '}' ) {
+      if ( c == '}' || marker.length() >= 10 ) {
         key = false;
         
         if ( marker.equals("{temp}") )
