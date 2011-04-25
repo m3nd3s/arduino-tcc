@@ -1,5 +1,6 @@
 #include "Ethernet.h"
 #include "SPI.h"
+#define WEBDUINO_SERIAL_DEBUGGING 1
 #include "WebServerAuth.h"
 #include <EEPROM.h>
 #include <SD.h>
@@ -42,7 +43,8 @@ void setup() {
 
     // Configurando comandos
     webserver.setDefaultCommand(&indexHTML);
-    webserver.addCommand("config", &configHTML);
+    webserver.setFailureCommand(&indexHTML);
+    //webserver.addCommand("config", &configHTML);
     //webserver.addCommand("logout", &logout);
 
     // Inicializando o servidor Web
