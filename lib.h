@@ -92,13 +92,21 @@ String getTemperatureAndTime()
 void indexHTML(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) {
     server.httpSuccess();
 
+    //char filename[9];
+    //for( int i = 1; i < strlen(server.requestURI); i++ )
+    //    filename[i-1] = server.requestURI[i];
+    Serial.println("----------------------------------------");
+    Serial.println(server.requestURI);
+    Serial.println("----------------------------------------");
+
     // Lendo o arquivo index.html disco
-    if (! file.open(&root, "index.htm", O_READ)) {
+    if (! file.open(&root, server.requestURI, O_READ)) {
         server.println("HTTP/1.1 404 Not Found");
         server.println("Content-Type: text/html");
         server.println();
         server.println("<h2>File Not Found!</h2>");
     }
+
     String marker = "";
     boolean key = false;
     char c;
