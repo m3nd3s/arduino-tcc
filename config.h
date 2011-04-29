@@ -36,6 +36,14 @@ uint8_t CE_PIN   = 5;
 uint8_t IO_PIN   = 6;
 uint8_t SCLK_PIN = 7;
 
+/* LED */
+uint8_t LED_PIN = 8;
+bool LED_ON = false;
+float TEMP;
+
+/* Timer */
+Time t;
+
 /* Create buffers */
 char buf[60];
 char day[10];

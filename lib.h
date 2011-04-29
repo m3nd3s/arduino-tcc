@@ -48,7 +48,7 @@ String getTemperatureAndTime()
   //Serial.println(temp);
   
   /* Get the current time and date from the chip */
-  Time t = rtc.time();
+  t = rtc.time();
 
   /* Name the day of the week */
   memset(day, 0, sizeof(day));  /* clear day buffer */
@@ -76,14 +76,14 @@ String getTemperatureAndTime()
       break;
   }
 
-  float temp = sensors.getTempCByIndex(0);
-  int dec = (temp - ((int)temp)) * 100;
+  TEMP = sensors.getTempCByIndex(0);
+  int dec = (TEMP - ((int)TEMP)) * 100;
   Serial.println(dec);
   /* Format the time and date and insert into the temporary buffer */
   snprintf(buf, sizeof(buf), "%s %04d-%02d-%02d %02d:%02d:%02d %02d.%d",
            day,
            t.yr, t.mon, t.date,
-           t.hr, t.min, t.sec, (int) temp, dec);
+           t.hr, t.min, t.sec, (int) TEMP, dec);
 
   /* Print the formatted string to serial so we can see the time */
   return buf;
@@ -91,16 +91,15 @@ String getTemperatureAndTime()
 
 void indexHTML(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) {
     server.httpSuccess();
-
-    //char filename[9];
-    //for( int i = 1; i < strlen(server.requestURI); i++ )
-    //    filename[i-1] = server.requestURI[i];
-    Serial.println("----------------------------------------");
-    Serial.println(server.requestURI);
-    Serial.println("----------------------------------------");
+    const char *filename;
+    
+    if ( strlen(server.requestURI) == 0 )
+        filename = "index.htm";
+     else
+         filename = server.requestURI;
 
     // Lendo o arquivo index.html disco
-    if (! file.open(&root, server.requestURI, O_READ)) {
+    if (! file.open(&root, filename, O_READ)) {
         server.println("HTTP/1.1 404 Not Found");
         server.println("Content-Type: text/html");
         server.println();

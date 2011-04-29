@@ -348,7 +348,8 @@ void WebServer::printCRLF()
 bool WebServer::dispatchCommand(ConnectionType requestType, char *verb,
         bool tail_complete)
 {
-  requestURI = ++verb;
+  requestURI = verb;
+  requestURI++;
   if ((verb[0] == 0) || ((verb[0] == '/') && (verb[1] == 0)))
   {
     m_defaultCmd(*this, requestType, verb, tail_complete);
