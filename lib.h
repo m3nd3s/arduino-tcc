@@ -89,6 +89,13 @@ String getTemperatureAndTime()
   return buf;
 }
 
+void temp_logger() {
+    if ( file.open(&root, "log.txt", O_CREAT | O_APPEND | O_WRITE ) ) {
+       file.println(getTemperatureAndTime());
+       file.close();
+    }
+}
+
 void indexHTML(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) {
     server.httpSuccess();
     const char *filename;

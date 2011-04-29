@@ -70,12 +70,12 @@ void setup() {
 void loop(){
     char buff[64];
     int len = 64;
-    t = rtc.time();
 
-    if ( t.sec % 5 == 0 ) {
-        sensors.requestTemperatures(); // Send the command to get temperatures
+    if ( rtc.seconds() % 10 == 0 ) {
+        sensors.requestTemperaturesByIndex(0); // Send the command to get temperatures
         TEMP = sensors.getTempCByIndex(0);
         Serial.println(TEMP);
+        //temp_logger();
     }
 
     if ( ! LED_ON ) {
