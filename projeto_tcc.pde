@@ -28,7 +28,7 @@ void loop(){
   Client client = server.available();
   if ( client ) {
       boolean blank = true;
-
+      index = 0;
       while( client.connected() ){
         if( client.available() ){
           char c = client.read();
@@ -43,7 +43,12 @@ void loop(){
             client.println("Content-Type: text/html");
             client.println();
 
-            client.println("<h1>ARDUINO</h1> <form><input type='hidden' value='1' name='action' /><input type='submit' value='LIGAR' /></form>");
+            client.println("<h1>ARDUINO</h1>");
+            client.println("<form method='GET' action='/?'>");
+            client.println("<input type='radio' value='1' name='led' id='led1' /><label for='led1'>LIGAR</label>");
+            client.println("<input type='radio' value='0' name='led' id='led2' /><label for='led2'>DESLIGAR</label>");
+            client.println("<input type='submit' value='ENVIAR' /><br />");
+            client.println("</form>");
             break;
           }
 
@@ -54,10 +59,10 @@ void loop(){
               blank = false;
 
           // Check what was passed by URL
-          if( strstr(clientline, "/?action=1") != 0 )
+          if( strstr(clientline, "led=1") != NULL )
             digitalWrite(ledPin, HIGH);
           else
-            if( strstr(clientline, "/?action=0") != 0 )
+            if( strstr(clientline, "led=0") != NULL )
               digitalWrite(ledPin, LOW);
 
         }
@@ -65,7 +70,7 @@ void loop(){
       Serial.print("SAIDA: ");
       Serial.println(clientline);
       Serial.print("Comparacao: ");
-      Serial.println(strlen(strstr(clientline, "/?ation=1")));
+      Serial.println(strstr(clientline, "led=1"));
       delay(1);
       client.stop();
   }
