@@ -9,7 +9,7 @@ byte ip[] = { 192, 168, 100, 200 };
 Server server(80);
 
 // Definitions
-#define BUFFER_SIZE 100
+#define BUFFER_SIZE 1024
 char clientline[BUFFER_SIZE];
 int index = 0;
 int ledPin = 5;
@@ -44,14 +44,14 @@ void loop(){
             client.println();
 
             client.println("<h1>ARDUINO</h1>");
-            client.println("<form method='GET' action='/?'>");
+            client.println("<form method='POST' action='/?'>");
             client.println("<input type='radio' value='1' name='led' id='led1' /><label for='led1'>LIGAR</label>");
             client.println("<input type='radio' value='0' name='led' id='led2' /><label for='led2'>DESLIGAR</label>");
             client.println("<input type='submit' value='ENVIAR' /><br />");
             client.println("</form>");
             break;
           }
-
+Serial.println(c);
           if( c == '\n' )
             blank = true;
           else
@@ -67,10 +67,7 @@ void loop(){
 
         }
       }
-      Serial.print("SAIDA: ");
       Serial.println(clientline);
-      Serial.print("Comparacao: ");
-      Serial.println(strstr(clientline, "led=1"));
       delay(1);
       client.stop();
   }
