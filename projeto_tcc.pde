@@ -1,97 +1,48 @@
-#include "Ethernet.h"
 #include "SPI.h"
-#define WEBDUINO_SERIAL_DEBUGGING 1
-#include "WebServerAuth.h"
-#include <EEPROM.h>
-#include <SD.h>
-#include <string.h>
+#include "Ethernet.h"
 
-#include <stdio.h>
-#include <DS1302.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
+// Network configuration
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+byte ip[] = { 192, 168, 100, 200 };
 
-#include "config.h" // Configurações e variáveis globais
-#include "lib.h" // Funções
+// Server instance on port 80
+Server server(80);
 
-
-// Servidor Web (Webduino)
-// Usuário e senhas default
-#define PREFIX ""
-WebServerAuth webserver("admin", "admin", PREFIX, 80);
-
-void setup() {
-    Serial.begin(9600);
-    Ethernet.begin(mac, ip);
-    sensors.begin();
-
-    char nome[8] = {};
-    eepromReadString(0, nome);
-
-    // Configuração necessária para leitura do microSD card
-    pinMode(10, OUTPUT);
-    digitalWrite(10, HIGH);
-    
-    // Inicializando o SD Card
-    if (!card.init(SPI_HALF_SPEED, 4)) error("card.init failed!");
-    if (!volume.init(&card)) error("vol.init failed!");
-    if (!root.openRoot(&volume)) error("openRoot failed");
-    root.ls(LS_DATE | LS_SIZE);
-    root.ls(LS_R);
-
-    // Configurando comandos
-    webserver.setDefaultCommand(&indexHTML);
-    webserver.setFailureCommand(&indexHTML);
-    //webserver.addCommand("config", &configHTML);
-    //webserver.addCommand("logout", &logout);
-
-    // Inicializando o servidor Web
-    webserver.begin();
-    
-    /* Initialize a new chip by turning off write protection and clearing the
-     clock halt flag. These methods needn't always be called. See the DS1302
-     datasheet for details. */
-    rtc.write_protect(false);
-    rtc.halt(false);
-  
-    /* Make a new time object to set the date and time */
-    /*   Tuesday, May 19, 2009 at 21:16:37.            */
-    Time t(2011, 4, 15, 20, 17, 17, 6);
-  
-    /* Set the time and date on the chip */
-    rtc.time(t);
-
-    /* Set the temperature */
-    sensors.requestTemperatures(); // Send the command to get temperatures
-    TEMP = sensors.getTempCByIndex(0);
-    pinMode(LED_PIN, OUTPUT);
+// Arduino Setup
+void setup(){
+  Ethernet.begin(mac, ip);
+  server.begin();
 }
 
 void loop(){
-    char buff[64];
-    int len = 64;
 
-    if ( rtc.seconds() % 10 == 0 ) {
-        sensors.requestTemperaturesByIndex(0); // Send the command to get temperatures
-        TEMP = sensors.getTempCByIndex(0);
-        Serial.println(TEMP);
-        //temp_logger();
-    }
+  // listen for incoming clients
+  Client client = server.available();
+  if ( client ) {
+      boolean blank = true;
 
-    if ( ! LED_ON ) {
-        if ( TEMP >= 20.0 ) {
-            Serial.println("Ligou!");
-            digitalWrite( LED_PIN, HIGH );
-            LED_ON = true;
+      while( client.connected() ){
+        if( client.available() ){
+          char c = client.read();
+
+          if( c == '\n' && blank ){
+            client.println("HTTP/1.1 200 OK");
+            client.println("Content-Type: text/html");
+            client.println();
+
+            client.println("<h1>ARDUINO</h1>");
+            break;
+          }
+
+          if( c == '\n' )
+            blank = true;
+          else
+            if( c != '\r' )
+              blank = false;
         }
-    } else {
-        if ( TEMP < 20.0 ) {
-            Serial.println("Desligou");
-            digitalWrite( LED_PIN, LOW );
-            LED_ON = false;
-        }
-    }
+      }
+      delay(1);
+      client.stop();
+  }
 
-    /* process incoming connections one at a time forever */
-    webserver.processConnection(buff, &len);
 }
