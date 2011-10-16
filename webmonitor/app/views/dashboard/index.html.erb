@@ -29,6 +29,12 @@
         }]
       },
 
+      tooltip: {
+        formatter: function(){
+          return '<b>' + this.series.name + '</b><br />' + this.x + 'h: ' + this.y + "ºC";
+        }
+      },
+
       legend: {
         layout: 'vertical',
         align: 'right',
@@ -50,7 +56,7 @@
         }
       },
 */
-      series: [{ name: 'Sensor 1', data:[null, null, null, 7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 0, 25.2, 26.5, 23.3, 18.3, 0, null, 13.9, 9.6, null, null, null, null]}]
+      series: [{ name: 'Sensor 1', data:[<%= @temperatures_to_chart.join(",") %>]}]
     });
   });
 
