@@ -1,0 +1,9 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>E-mail:</b>
+  <%= @user.email %>
+</p>
+
+<%= link_to 'Edit', edit_profile_path(@user) %> |
+<%= link_to 'Back', profiles_path %>

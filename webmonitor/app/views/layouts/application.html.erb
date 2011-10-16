@@ -3,14 +3,18 @@
   <head>
     <title>Webmonitor</title>
     <%= stylesheet_link_tag    "application" %>
-    <%= javascript_include_tag "application" %>
+    <%= javascript_include_tag "application", "highcharts" %>
     <%= csrf_meta_tags %>
   </head>
   <body>
+
+    <%= render "shared/menu" %>
+
     <p class="notice"><%= notice %></p>
     <p class="alert"><%= alert %></p>
 
     <%= yield %>
 
+    <%= yield :javascript %>
   </body>
 </html>

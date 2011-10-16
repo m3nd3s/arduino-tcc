@@ -1,7 +1,10 @@
 Webmonitor::Application.routes.draw do
-  devise_for :users
 
+  devise_for :users
   resources :temperatures
+  resources :profiles
+
+  match "dashboard" => "dashboard#index"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
@@ -52,7 +55,7 @@ Webmonitor::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  root :to => 'temperatures#index'
+  root :to => 'dashboard#index'
 
   # See how all your routes lay out with "rake routes"
 
