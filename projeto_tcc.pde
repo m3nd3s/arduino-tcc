@@ -3,22 +3,22 @@
 
 // Network configuration
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-byte ip[] = { 192, 168, 3, 200 };
+byte ip[] = { 192, 168, 1, 200 };
 
 // Server instance on port 80
 Server server(80);
 
 // Definitions
-#define BUFFER_SIZE 1024
-char clientline[BUFFER_SIZE];
+#define BUFFER_SIZE 128
+//char line_header[BUFFER_SIZE];
+String line_header;
+char content_length[64];
 int index = 0;
-int index2 = 0;
 int ledPin = 5;
-int cr = 0;
-char line_header[50];
 
 // Arduino Setup
 void setup(){
+  line_header = "";
   Ethernet.begin(mac, ip);
   server.begin();
   pinMode(ledPin, OUTPUT);
@@ -29,16 +29,18 @@ void loop(){
 
   // listen for incoming clients
   Client client = server.available();
+
   if ( client ) {
+
       boolean blank = true;
       index = 0;
+
       while( client.connected() ){
         if( client.available() ){
           char c = client.read();
 
-          if( index < BUFFER_SIZE ) {
-            clientline[index] = c;
-            index++;
+          if( line_header.length() < 100 ) {
+            line_header += c;
           }
 
           if( c == '\n' && blank ){
@@ -57,40 +59,31 @@ void loop(){
 
           if( c == '\n' ) {
             blank = true;
-            Serial.print("HEADER: ");
             Serial.println(line_header);
 
-            if( strstr(line_header, "Content-Length: ") != NULL ) {
-              memset(clientline, 0, BUFFER_SIZE);
-              index = 0;
-              for(int i=0; i < 7; i ++){
-                clientline[i] = client.read();
-              }
-              post_data_exit = true;
+            if ( line_header.indexOf("Content-Length:") >= 0 ) {
+              line_header.substring(16).toCharArray(content_length, 64); 
+              Serial.print("Tamanho: ");
+              Serial.println(atoi(content_length));
             }
-            memset(line_header, 0, 50);
-            index2 = 0;
+
+            // Check what was passed by URL
+            if( line_header.indexOf("led=1") > 0 )
+              digitalWrite(ledPin, HIGH);
+            else
+              if( line_header.indexOf("led=0") >0 )
+                digitalWrite(ledPin, LOW);
+            
+            line_header = "";
+
           } else {
               if( c != '\r' ) {
                 blank = false;
-                if ( index2 < 50 ) {
-                  line_header[index2] = c;
-                  index2++;
-                }
               } 
           }
-
-          // Check what was passed by URL
-          if( strstr(clientline, "led=1") != NULL )
-            digitalWrite(ledPin, HIGH);
-          else
-            if( strstr(clientline, "led=0") != NULL )
-              digitalWrite(ledPin, LOW);
         }
       }
-      Serial.println(clientline);
       delay(1);
       client.stop();
   }
-
 }
