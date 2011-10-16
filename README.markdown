@@ -39,7 +39,7 @@ Adicione a seguinte linha no `.bashrc` (Linux) ou `.bash_profile` do MacOS X
 
 Depois feche e reabra o terminal para carregar as configurações do RVM
 
-# Instalando o Ruby
+## Instalando o Ruby
 
 Rode os comandos abaixo
 
@@ -49,7 +49,7 @@ Instalando o ruby 1.9.2
 
 Aguarde o processo de download, compilação e instalação finalzar.
 
-# Configurando o Rails
+## Configurando o Rails
 
 O projeto rails já está disponível aqui no Github, ao executar um `git pull origin master` aparecerá uma pasta de nome `webmonitor`, ela é o sistema Rails.
 
@@ -62,7 +62,7 @@ Uma vez configurado o MySQL é hora de realizar o setup do Rails, para tanto ent
     $ rake db:setup
     $ rails s # isso inicializará o servidor rails
 
-## Contatos
+# Contatos
 m3nd3s@gmail.com
 renato@tecnoteam.com.br
 
