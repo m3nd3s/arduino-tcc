@@ -14,14 +14,26 @@ end
 
 if Temperature.count.eql?(0)
   24.times do |i|
-    Temperature.create( { :checking => Time.now - i.hour, :value => ( Random.new.rand(90..300) / 10.0 ), :sensor_id => 0 })
+    Temperature.create( { :checking => Time.now - i.hour, :value => ( Random.new.rand(90..300) / 10.0 ), :sensor_id => 1 })
   end
 
   24.times do |i|
-    Temperature.create( { :checking => Time.now - 1.day - i.hour, :value => ( Random.new.rand(90..300) / 10.0 ), :sensor_id => 0 })
+    Temperature.create( { :checking => Time.now - 1.day - i.hour, :value => ( Random.new.rand(90..300) / 10.0 ), :sensor_id => 1 })
   end
 
   24.times do |i|
-    Temperature.create( { :checking => Time.now - 2.day - i.hour, :value => ( Random.new.rand(90..300) / 10.0 ), :sensor_id => 0 })
+    Temperature.create( { :checking => Time.now - 2.day - i.hour, :value => ( Random.new.rand(90..300) / 10.0 ), :sensor_id => 1 })
+  end
+
+  24.times do |i|
+    Temperature.create( { :checking => Time.now - i.hour, :value => ( Random.new.rand(90..300) / 10.0 ), :sensor_id => 2 })
+  end
+
+  24.times do |i|
+    Temperature.create( { :checking => Time.now - 1.day - i.hour, :value => ( Random.new.rand(90..300) / 10.0 ), :sensor_id => 2 })
+  end
+
+  24.times do |i|
+    Temperature.create( { :checking => Time.now - 2.day - i.hour, :value => ( Random.new.rand(90..300) / 10.0 ), :sensor_id => 2 })
   end
 end

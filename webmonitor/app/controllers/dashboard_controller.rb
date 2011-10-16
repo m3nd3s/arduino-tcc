@@ -1,7 +1,8 @@
 class DashboardController < ApplicationController
 
   def index
-    @temperatures = Temperature.where("sensor_id = ? AND checking BETWEEN ? AND ?", 0, Time.now - 1.day, Time.now)
+    sensor_id = params[:sensor_id] || 1
+    @temperatures = Temperature.where("sensor_id = ? AND checking BETWEEN ? AND ?", sensor_id, Time.now.beginning_of_day, Time.now.end_of_day)
     @temperatures_to_chart = @temperatures.collect { |t| t.value }
 
     @temperatures_to_chart = [0] unless @temperatures_to_chart
