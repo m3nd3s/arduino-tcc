@@ -1,0 +1,25 @@
+<h1>Listing temperatures</h1>
+
+<table>
+  <tr>
+    <th>Checking</th>
+    <th>Value</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @temperatures.each do |temperature| %>
+  <tr>
+    <td><%= temperature.checking %></td>
+    <td><%= temperature.value %></td>
+    <td><%= link_to 'Show', temperature %></td>
+    <td><%= link_to 'Edit', edit_temperature_path(temperature) %></td>
+    <td><%= link_to 'Destroy', temperature, confirm: 'Are you sure?', method: :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Temperature', new_temperature_path %>
