@@ -11,13 +11,22 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111016022455) do
+ActiveRecord::Schema.define(:version => 20111016122911) do
+
+  create_table "sensors", :force => true do |t|
+    t.integer  "sid"
+    t.string   "name"
+    t.string   "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "temperatures", :force => true do |t|
     t.datetime "checking"
     t.float    "value"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "sensor_id"
   end
 
   create_table "users", :force => true do |t|
