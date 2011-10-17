@@ -1,5 +1,7 @@
-#include "SPI.h"
-#include "Ethernet.h"
+#include <SPI.h>
+#include <Ethernet.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 // Network configuration
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
@@ -10,22 +12,58 @@ Server server(80);
 
 // Definitions
 #define BUFFER_SIZE 128
+#define ONE_WIRE_BUS 2
+#define LEDPIN 5
+
 //char line_header[BUFFER_SIZE];
 String line_header;
 char content_length[64];
 int index = 0;
-int ledPin = 5;
+
+// Configuring the OneWire bus, to temperature sensors
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+DeviceAddress thermometer;
+float current_temp;
+
+// Alarm handler, should turn on the LED pin if some alarm is handled
+void alarm_handler(uint8_t* device_address) {
+  Serial.println("ALARM!!!!");
+  digitalWrite(LEDPIN, HIGH);
+}
 
 // Arduino Setup
 void setup(){
   line_header = "";
+
+  // Beginning the services
   Ethernet.begin(mac, ip);
   server.begin();
-  pinMode(ledPin, OUTPUT);
+  sensors.begin();
   Serial.begin(9600);
+
+  // Set led mode
+  pinMode(LEDPIN, OUTPUT);
+
+  // Thermometer address
+  sensors.getAddress(thermometer, 0);
+  // alarm when temp is higher than 28C
+  sensors.setHighAlarmTemp(thermometer, 28);
+  // alarm when temp is lower than 19C
+  sensors.setLowAlarmTemp(thermometer, 19); 
+  // set alarm handle
+  sensors.setAlarmHandler(&alarm_handler);
 }
 
 void loop(){
+
+  Serial.println("Requesting Temperatures");
+  sensors.requestTemperatures();
+
+  // Alarm
+/*  if ( !sensors.hasAlarm() ) {
+    digitalWrite(LEDPIN, LOW);
+  }*/
 
   // listen for incoming clients
   Client client = server.available();
@@ -49,6 +87,14 @@ void loop(){
             client.println();
 
             client.println("<h1>ARDUINO</h1>");
+
+            current_temp = sensors.getTempCByIndex(0);
+            client.print("<h3>Temperatura atual: ");
+            client.print(current_temp);
+            Serial.println(current_temp);
+            client.println("</h3>");
+
+
             client.println("<form method='POST' action='/?'>");
             client.println("<input type='radio' value='1' name='led' id='led1' /><label for='led1'>LIGAR</label>");
             client.println("<input type='radio' value='0' name='led' id='led2' /><label for='led2'>DESLIGAR</label>");
@@ -69,10 +115,10 @@ void loop(){
 
             // Check what was passed by URL
             if( line_header.indexOf("led=1") > 0 )
-              digitalWrite(ledPin, HIGH);
+              digitalWrite(LEDPIN, HIGH);
             else
               if( line_header.indexOf("led=0") >0 )
-                digitalWrite(ledPin, LOW);
+                digitalWrite(LEDPIN, LOW);
             
             line_header = "";
 
