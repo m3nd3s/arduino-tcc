@@ -52,12 +52,23 @@
     location.href = "<%= url_for ( dashboard_path ) %>" + "/?sensor_id="+ $(object).val();
   }
 
+  $("#refresh_temperature").click(function(){
+      $("#current_temperature > span").load("<%= current_temperature_path %>");
+  });
+
   //]]>
   </script>
 <% end %>
 
+<div id="current_temperature">
+  <span></span>
+</div>
+<p align="center"><a href="#" id="refresh_temperature">Clique aqui para atualizar</a></p>
+<hr />
+
+<%= label_tag :sensor, "Selecione o sensor:" %>
+<%= collection_select :sensor, :sensor, Sensor.all, :id, :name, {:include_blank => true},  {:onchange => "get_temperature(this);" } %><br />
 <div id="container" style="width: 100%; height: 400px"></div>
 
-<%= label_tag :sensor, "Select sensor:" %>
-<%= collection_select :sensor, :sensor, Sensor.all, :id, :name, {:include_blank => true},  {:onchange => "get_temperature(this);" } %>
+Sensor 0: <%= link_to "Realizar leitura", get_temperature_path %>
 

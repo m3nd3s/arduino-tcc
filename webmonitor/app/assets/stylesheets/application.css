@@ -45,3 +45,14 @@
   display: block;
   overflow: auto;
 } 
+
+#current_temperature {
+  border: 1px solid #CCC;
+  padding: 7px;
+  text-align: center;
+  display: block;
+  width: 150px;
+  height: 24px;
+  font-size: 200%;
+  margin: auto;
+}

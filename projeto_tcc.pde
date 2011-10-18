@@ -26,6 +26,7 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 DeviceAddress thermometer;
 float current_temp;
+boolean returnJson = false;
 
 // Alarm handler, should turn on the LED pin if some alarm is handled
 void alarm_handler(uint8_t* device_address) {
@@ -89,20 +90,26 @@ void loop(){
             client.println("Content-Type: text/html");
             client.println();
 
-            client.println("<h1>ARDUINO</h1>");
-
             current_temp = sensors.getTempCByIndex(0);
-            client.print("<h3>Temperatura atual: ");
-            client.print(current_temp);
-            Serial.println(current_temp);
-            client.println("</h3>");
+
+            if( returnJson ) {
+              client.println(current_temp);
+            }
+            else{
+              client.println("<h1>ARDUINO</h1>");
+
+              client.print("<h3>Temperatura atual: ");
+              client.print(current_temp);
+              Serial.println(current_temp);
+              client.println("</h3>");
 
 
-            client.println("<form method='POST' action='/?'>");
-            client.println("<input type='radio' value='1' name='led' id='led1' /><label for='led1'>LIGAR</label>");
-            client.println("<input type='radio' value='0' name='led' id='led2' /><label for='led2'>DESLIGAR</label>");
-            client.println("<input type='submit' value='ENVIAR' /><br />");
-            client.println("</form>");
+              client.println("<form method='POST' action='/?'>");
+              client.println("<input type='radio' value='1' name='led' id='led1' /><label for='led1'>LIGAR</label>");
+              client.println("<input type='radio' value='0' name='led' id='led2' /><label for='led2'>DESLIGAR</label>");
+              client.println("<input type='submit' value='ENVIAR' /><br />");
+              client.println("</form>");
+            }
             break;
           }
 
@@ -119,10 +126,13 @@ void loop(){
             // Check what was passed by URL
             if( line_header.indexOf("led=1") > 0 )
               digitalWrite(LEDPIN, HIGH);
-            else
-              if( line_header.indexOf("led=0") >0 )
-                digitalWrite(LEDPIN, LOW);
-            
+
+            if( line_header.indexOf("led=0") >0 )
+              digitalWrite(LEDPIN, LOW);
+
+            if ( line_header.indexOf("?token=1qaz2wsx") > 0 && line_header.indexOf("GET /getTemperature") > 0 )
+              returnJson = true;
+
             line_header = "";
 
           } else {

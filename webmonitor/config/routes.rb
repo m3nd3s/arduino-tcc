@@ -5,6 +5,8 @@ Webmonitor::Application.routes.draw do
   resources :profiles
 
   match "dashboard" => "dashboard#index", :as => :dashboard
+  match "get_temperature" => "dashboard#get_temperature", :as => :get_temperature
+  match "current_temperature" => "dashboard#current_temperature", :as => :current_temperature
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
