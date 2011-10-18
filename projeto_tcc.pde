@@ -13,6 +13,7 @@ Server server(80);
 // Definitions
 #define BUFFER_SIZE 128
 #define ONE_WIRE_BUS 2
+#define TEMPERATURE_PRECISION 9
 #define LEDPIN 5
 
 //char line_header[BUFFER_SIZE];
@@ -48,7 +49,7 @@ void setup(){
   // Thermometer address
   sensors.getAddress(thermometer, 0);
   // alarm when temp is higher than 28C
-  sensors.setHighAlarmTemp(thermometer, 28);
+  sensors.setHighAlarmTemp(thermometer, 25);
   // alarm when temp is lower than 19C
   sensors.setLowAlarmTemp(thermometer, 19); 
   // set alarm handle
@@ -60,10 +61,12 @@ void loop(){
   Serial.println("Requesting Temperatures");
   sensors.requestTemperatures();
 
-  // Alarm
-/*  if ( !sensors.hasAlarm() ) {
+  if ( !sensors.hasAlarm() ) {
     digitalWrite(LEDPIN, LOW);
-  }*/
+  }
+
+  // Alarm
+  sensors.processAlarms();
 
   // listen for incoming clients
   Client client = server.available();
