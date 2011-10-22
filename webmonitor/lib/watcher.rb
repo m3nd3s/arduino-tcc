@@ -9,7 +9,7 @@ class Watcher
     def get_temperature
       Rails.logger.info "Realizando leitura de temperatura"
       response = HTTParty.get("#{DEFAULT_URL}?token=#{TOKEN}")
-      response.body
+      response.body.split(",")
     end
   end
 
