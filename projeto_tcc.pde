@@ -27,6 +27,8 @@ void alarm_handler(uint8_t* device_address) {
 
 void render_html(Client client) {
   char *filename;
+  boolean returnCSV = false;
+
   filename = line_header + 5;
   (strstr(line_header, " HTTP"))[0] = 0; // Force the end of line
   Serial.print("ARQUIVO: ");
@@ -34,26 +36,53 @@ void render_html(Client client) {
 
   if ( strlen(filename) == 0 ) {
     filename = "index.htm";
+  } else {
+    if ( strstr(filename, "getTemperature") != 0 && strstr(filename, "?token=1qaz2wsx") != 0 )
+      returnCSV = true;
   }
 
-  // File not found 
-  if ( !sd_file.open(&sd_root, filename, O_READ ) ) {
-    client.println("HTTP/1.1 404 Not Found");
-    client.println("Content-Type: text/html");
+  current_temp = sensors.getTempCByIndex(0);
+  t = rtc.time();
+
+  if ( !returnCSV ) {
+    // File not found 
+    if ( !sd_file.open(&sd_root, filename, O_READ ) ) {
+      client.println("HTTP/1.1 404 Not Found");
+      client.println("Content-Type: text/html");
+      client.println();
+      client.println("<h2>File Not Found!</h2>");
+    }
+
+    client.println("HTTP/1.1 200 OK");
+
+    // Define the kind of file
+    if ( strstr(filename, ".htm") != 0 )
+      client.println("Content-Type: text/html");
+    else if ( strstr(filename, ".jpg") != 0 )
+      client.println("Content-Type: image/jpeg");
+    else if ( strstr(filename, ".gif") != 0 )
+      client.println("Content-Type: image/gif");
+    else if ( strstr(filename, ".png") != 0 )
+      client.println("Content-Type: image/png");
+    else
+      client.println("Content-Type: text");
+
     client.println();
-    client.println("<h2>File Not Found!</h2>");
-  }
 
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: text/html");
-  client.println();
-
-  char _c;
-  // Read file from SD Card
-  while( ( _c = sd_file.read() ) > 0 ) {
-    client.print(_c);
+    char _c;
+    // Read file from SD Card
+    while( ( _c = sd_file.read() ) > 0 ) {
+      client.print(_c);
+    }
+    sd_file.close();
+  } else {
+    char csv[25];
+    int d1 = current_temp;
+    float f = current_temp - d1;
+    int d2 = f * 100;
+    sprintf(csv, "%04d-%02d-%02d %02d:%02d:%02d,%d.%02d", t.yr, t.mon, t.date, t.hr, t.min, t.sec, d1, d2);
+    client.println(csv);
   }
-  sd_file.close();
 }
 
 // Arduino Setup
@@ -115,7 +144,7 @@ void loop(){
   sensors.requestTemperatures();
   sensors.processAlarms(); // Alarm
 
-
+  // If no sensor alarm, turn of LED and BUZZER
   if ( !sensors.hasAlarm() ) {
     digitalWrite(LED_PIN, LOW);
     noTone(BUZZ_PIN);
@@ -147,9 +176,6 @@ void loop(){
           Serial.println(line_header);
 
           if( strstr(line_header, "GET /") != NULL ){
-            //client.println("HTTP/1.1 200 OK");
-            //client.println("Content-Type: text/html");
-            //client.println();
             render_html(client);
 /*
             current_temp = sensors.getTempCByIndex(0);
