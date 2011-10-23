@@ -177,38 +177,6 @@ void loop(){
 
           if( strstr(line_header, "GET /") != NULL ){
             render_html(client);
-/*
-            current_temp = sensors.getTempCByIndex(0);
-            t = rtc.time();
-
-            if( returnJson ) {
-              char dtt_json[25];
-              int d1 = current_temp;
-              float f = current_temp - d1;
-              int d2 = f * 100;
-              sprintf(dtt_json, "%04d-%02d-%02d %02d:%02d:%02d,%d.%02d", t.yr, t.mon, t.date, t.hr, t.min, t.sec, d1, d2);
-              client.println(dtt_json);
-            } else {
-              client.println("<h1>ARDUINO</h1>");
-
-              client.print("<h3>Temperatura atual: ");
-              client.print(current_temp);
-              Serial.println(current_temp);
-              client.println("</h3>");
-
-              client.print("<h3>Data/Hora atual: ");
-              char datetime[19];
-              sprintf(datetime, "%02d/%02d/%04d %02d:%02d:%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec);
-              client.print(datetime);
-              client.println("</h3>");
-
-              client.println("<form method='POST' action='/?'>");
-              client.println("<input type='radio' value='1' name='led' id='led1' /><label for='led1'>LIGAR</label>");
-              client.println("<input type='radio' value='0' name='led' id='led2' /><label for='led2'>DESLIGAR</label>");
-              client.println("<input type='submit' value='ENVIAR' /><br />");
-              client.println("</form>");
-            }
-*/
           } else {
             // 404
             client.println("HTTP/1.1 404 Not Found");
