@@ -1,0 +1,108 @@
+body {
+    margin: 1px 5px;
+    font-family: arial, verdana, sans-serif;
+    font-size: 12px;
+}
+
+#nav {
+    width: 100%;
+    float: left;
+    margin: 0 0 3em 0;
+    padding: 0;
+    list-style: none; 
+    background-color: #f2f2f2;
+    border-bottom: 1px solid #ccc; 
+    border-top: 1px solid #ccc;
+}
+#nav li {
+    float: left; 
+}
+#nav li a {
+    display: block;
+    padding: 8px 15px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #169;
+    border-right: 1px solid #ccc; 
+}
+#nav li a:hover {
+    color: #c00;
+    background-color: #fff; 
+}
+
+#container {
+  margin: 0 auto;
+  padding: 10px;
+  text-align: left;
+  width: 500px;
+}
+
+#container h1 {
+  color: #036;
+  text-align: center;
+}
+
+fieldset {
+  display: block;
+  clear: both;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+fieldset div.field {
+  display: block;
+  margin-bottom: 10px;
+  padding: 0;
+}
+
+fieldset div.field label {
+  float: left;
+  padding: 0 10px;
+  text-align: right;
+  width: 100px;
+}
+
+fieldset div.obligatory {
+  font-weight: bold;
+}
+form {
+    margin: 0;
+    padding: 0;
+}
+
+legend {
+    background: none repeat scroll 0 0 transparent;
+    color: #003366;
+    font-size: 1.3em;
+    font-weight: bold;
+    margin: 1em 0;
+    padding: 0 0.5em;
+}
+
+#submit {
+  clear: both;
+  padding-top: 10px;
+  text-align: center;
+}
+
+#submit input {
+  border: 1px solid #333;
+  background-color: #036;
+  color: #FFF;
+  padding: 2px 5px;
+  font-size: 120%;
+}
+
+#submit input:hover {
+  background-color: #069;
+  color: #FFF;
+}
+
+input.large{
+  width: 70%;
+}
+
+input.medium{
+  width: 50%;
+}
