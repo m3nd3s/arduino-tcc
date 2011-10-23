@@ -14,6 +14,7 @@ body {
     border-bottom: 1px solid #ccc; 
     border-top: 1px solid #ccc;
 }
+
 #nav li {
     float: left; 
 }
@@ -28,6 +29,27 @@ body {
 #nav li a:hover {
     color: #c00;
     background-color: #fff; 
+}
+
+#nav_config {
+  width: 300px;
+  margin: 0 auto;
+  list-style: none;
+}
+
+#nav_config li {
+  padding: 3px 0;
+  font-size: 120%;
+}
+
+#nav_config li a {
+  text-decoration: none;
+  color: #116699;
+}
+
+#nav_config li a:hover {
+  color: #CC0000;
+  text-decoration: underline;
 }
 
 #container {
@@ -106,3 +128,27 @@ input.large{
 input.medium{
   width: 50%;
 }
+
+input.small {
+  width: 50px;
+}
+
+.temp_box {
+  display: block;
+  clear: both;
+  border: 1px solid #CCC;
+  width: 250px;
+  height: 150px;
+  margin: 0 auto;
+  -moz-border-radius: 14px;
+  border-radius: 14px;
+}
+
+.temp_box .temp {
+  font-size: 600%;
+  text-align: center;
+}
+
+.temp_box p.time {
+  font-size: 150%;
+  text-align: center;

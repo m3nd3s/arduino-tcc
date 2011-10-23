@@ -1,0 +1,106 @@
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>Configura&ccedil;&atilde;o</title>
+        <link rel="stylesheet" href="style.css" type="text/css" media="all" charset="utf-8"/>
+        <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
+    </head>
+
+    <body>
+      <!-- MENU -->
+      <ul id="nav">
+          <li><a href="/index.htm">Home</a></li>
+          <li><a href="/log.htm">Registros</a></li>
+          <li><a href="/config.htm">Configura&ccedil;&atilde;o</a></li>
+      </ul>
+      <!-- FIM MENU -->
+
+      <div id="container">
+        <h1>Seguran&ccedil;a e Rede</h1>
+        <!-- FORM -->
+        <form action="sec.htm" method="POST" name="config_form" id="config_form">
+
+          <fieldset>
+            <legend>Seguran&ccedil;a</legend>
+
+            <div class="field obligatory">
+              <label for="username">*Usu&aacute;rio:</label>
+              <input type="text" name="username" id="username" value="" />
+            </div>
+
+            <div class="field">
+              <label for="password">Senha:</label>
+              <input type="password" name="password" id="password" value="" />
+            </div>
+
+            <div class="field">
+              <label for="password_confirmation">Confirma&ccedil;&atilde;o:</label>
+              <input type="password" name="password_confirmation" id="password_confirmation" value="" />
+            </div>
+
+            <div class="field obligatory">
+              <label for="token">*Token de seguran&ccedil;a:</label>
+              <input type="text" name="token" id="token" value="" class="large" />
+            </div>
+
+          </fieldset>
+
+          <fieldset>
+            <legend>Rede</legend>
+
+            <div class="field obligatory">
+              <label for="ip_address">*Endere&ccedil;o IP</label>
+              <input type="text" name="ip_address" id="ip_address" value="" />
+            </div>
+
+            <div class="field obligatory">
+              <label for="mac_address">*Endere&ccedil;o MAC:</label>
+              <input type="text" name="mac_address" id="mac_address" value="" />
+            </div>
+
+            <div class="field">
+              <label for="gateway">Gateway da Rede:</label>
+              <input type="text" name="gateway" id="gateway" value="" />
+            </div>
+
+            <div class="field">
+              <label for="mask">M&aacute;scara:</label>
+              <input type="text" name="mask" id="mask" value="" />
+            </div>
+
+          </fieldset>
+
+          <div id="submit">
+            <input type="submit" value="Salvar" name="salvar" /> 
+          </div>
+        </form>
+        <!-- FORM -->
+      </div>
+
+      <script type="text/javascript" language="javascript" charset="utf-8">
+      //<![CDATA[
+        $().ready(function(){
+          $("#config_form").submit(function(){
+
+            // valida o usuário
+            if ($("#username").val() == "" || $("#username").val().length < 8){
+              alert("Usuário inválido!\nDeve ter no mínimo 8 caracteres");
+              $("#username").focus();
+              return false;
+            }
+
+            // valida o usuário
+            if ($("#password").val() != $("#password_confirmation").val() ){
+              alert("A senha não confere!");
+              $("#password").focus();
+              return false;
+            }
+
+
+          });
+        });
+      //]]>
+      </script>
+
+    </body>
+</html>

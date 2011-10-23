@@ -1,0 +1,71 @@
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+        <title>Configura&ccedil;&atilde;o</title>
+        <link rel="stylesheet" href="style.css" type="text/css" media="all" charset="utf-8"/>
+        <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
+    </head>
+
+    <body>
+      <!-- MENU -->
+      <ul id="nav">
+          <li><a href="/index.htm">Home</a></li>
+          <li><a href="/log.htm">Registros</a></li>
+          <li><a href="/config.htm">Configura&ccedil;&atilde;o</a></li>
+      </ul>
+      <!-- FIM MENU -->
+
+      <div id="container">
+        <h1>Data e Hora</h1>
+        <!-- FORM -->
+        <form action="time.htm" method="POST" name="config_form" id="config_form">
+
+          <fieldset>
+            <legend>Data e Hora</legend>
+
+            <div class="field obligatory">
+              <label for="date">*Data:</label>
+              <input type="text" name="date" id="date" value="" class="small" maxlength="2" />
+              de
+              <select id="month" name="month">
+                <option value="1">Janeiro</option>
+                <option value="2">Fevereiro</option>
+                <option value="3">Mar&ccedil;o</option>
+                <option value="4">Abril</option>
+                <option value="5">Maio</option>
+                <option value="6">Junho</option>
+                <option value="7">Julho</option>
+                <option value="8">Agosto</option>
+                <option value="9">Setembro</option>
+                <option value="10">Outubro</option>
+                <option value="11">Novembro</option>
+                <option value="12">Dezembro</option>
+              </select>
+              de
+              20 <input type="text" name="year" id="year" value="" class="small" maxlength="2" size="3" />
+            </div>
+
+            <div class="field obligatory">
+              <label for="hour">*Hora:</label>
+              <input type="text" name="hour" id="hour" value="" class="small" maxlength="2" /> : 
+              <input type="text" name="min" id="hour" value="" class="small" maxlength="2" /> :
+              <input type="text" name="sec" id="hour" value="" class="small" maxlength="2" />
+            </div>
+          </fieldset>
+
+          <div id="submit">
+            <input type="submit" value="Salvar" name="salvar" /> 
+          </div>
+        </form>
+        <!-- FORM -->
+      </div>
+
+      <script type="text/javascript" language="javascript" charset="utf-8">
+      //<![CDATA[
+        $().ready(function(){
+        });
+      //]]>
+      </script>
+
+    </body>
+</html>
