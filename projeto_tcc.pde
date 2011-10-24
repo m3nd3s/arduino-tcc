@@ -20,7 +20,6 @@ float current_temp;
 void alarm_handler(uint8_t* device_address) {
   Serial.println("ALARM!!!!");
   float t = sensors.getTempCByIndex(0);
-  Serial.println(t);
   digitalWrite(LED_PIN, HIGH);
   tone(BUZZ_PIN, 10, 5000);
 }
@@ -31,8 +30,8 @@ void render_html(Client client) {
 
   filename = line_header + 5;
   (strstr(line_header, " HTTP"))[0] = 0; // Force the end of line
-  Serial.print("ARQUIVO: ");
-  Serial.println(filename);
+  //Serial.print("ARQUIVO: ");
+  //Serial.println(filename);
 
   if ( strlen(filename) == 0 ) {
     filename = "index.htm";
@@ -41,8 +40,17 @@ void render_html(Client client) {
       returnCSV = true;
   }
 
+  // Get temperature and time
   current_temp = sensors.getTempCByIndex(0);
   t = rtc.time();
+
+  char date[10];
+  char time[8];
+  int d1 = current_temp;
+  float f = current_temp - d1;
+  int d2 = f * 100;
+  sprintf(date, "%02d-%02d-%04d", t.date, t.mon, t.yr);
+  sprintf(time, "%02d:%02d:%02d", t.hr, t.min, t.sec);
 
   if ( !returnCSV ) {
     // File not found 
@@ -70,18 +78,41 @@ void render_html(Client client) {
     client.println();
 
     char _c;
+    String keyword = "";
+    boolean key = false;
+
     // Read file from SD Card
     while( ( _c = sd_file.read() ) > 0 ) {
-      client.print(_c);
+
+      if (_c == '{' ) key = true;
+
+      if ( key )
+        keyword += String(_c);
+      else
+        client.print( _c );
+
+      if ( _c == '}' || keyword.length() >= 16 ) {
+
+        key = false;
+        if ( keyword.equals( "{temp}" ) )
+          client.print(current_temp);
+        else if(keyword.equals( "{date}" ))
+          client.print(date);
+        else
+          client.print(keyword);
+        
+        keyword = "";
+      }
+
     }
+
     sd_file.close();
+
   } else {
-    char csv[25];
-    int d1 = current_temp;
-    float f = current_temp - d1;
-    int d2 = f * 100;
+    char csv[22];
     sprintf(csv, "%04d-%02d-%02d %02d:%02d:%02d,%d.%02d", t.yr, t.mon, t.date, t.hr, t.min, t.sec, d1, d2);
     client.println(csv);
+
   }
 }
 
@@ -144,6 +175,13 @@ void loop(){
   sensors.requestTemperatures();
   sensors.processAlarms(); // Alarm
 
+  t = rtc.time();
+
+  if ( t.sec == 0 ) {
+    Serial.println("Granvando log...");
+    logger();
+  }
+
   // If no sensor alarm, turn of LED and BUZZER
   if ( !sensors.hasAlarm() ) {
     digitalWrite(LED_PIN, LOW);
@@ -172,8 +210,8 @@ void loop(){
 
           line_header[index] = 0;
 
-          Serial.print("HEADER:");
-          Serial.println(line_header);
+          //Serial.print("HEADER:");
+          //Serial.println(line_header);
 
           if( strstr(line_header, "GET /") != NULL ){
             render_html(client);
