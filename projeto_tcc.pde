@@ -12,14 +12,6 @@
 // Incluindo funções de uso
 #include "func.h"
 
-// Alarm handler, should turn on the LED pin if some alarm is handled
-void alarm_handler(uint8_t* device_address) {
-  Serial.println("ALARM!!!!");
-  float t = sensors.getTempCByIndex(0);
-  digitalWrite(LED_PIN, HIGH);
-  tone(BUZZ_PIN, 10, 5000);
-}
-
 // Arduino Setup
 void setup(){
   // Beginning the services

@@ -57,6 +57,7 @@ void render_html(const char *_header, Client client){
   
   // Requisição de arquivo normal
   if ( !isCSV) {
+    // Tenta abrir o arquivo para leitura
     if ( !sd_file.open(&sd_root, filename, O_READ ) ) {
       file_not_found(client);
     }
@@ -145,11 +146,8 @@ void processing_request( Client client ) {
         // Adiciona null ao final do header
         header[index] = 0;
         index = 0;
-
-        if( isGET(header) )
-          render_html(header, client);
-        else
-          file_not_found(client); // 404
+        // Renderiza o html
+        render_html(header, client);
         
         break;
       }
@@ -172,3 +170,13 @@ void logger() {
        sd_file.close();
     }
 }
+
+// Função chamada quando um alarme é ativado nos sensores de temperatura
+void alarm_handler(uint8_t* device_address) {
+  Serial.println("ALARM!!!!");
+  float t = sensors.getTempCByIndex(0);
+  digitalWrite(LED_PIN, HIGH);
+  tone(BUZZ_PIN, 10, 5000);
+}
+
+
