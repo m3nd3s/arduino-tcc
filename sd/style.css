@@ -108,12 +108,22 @@ legend {
   text-align: center;
 }
 
-#submit input {
+#submit input, a.btn {
   border: 1px solid #333;
   background-color: #036;
   color: #FFF;
   padding: 2px 5px;
   font-size: 120%;
+}
+
+a.btn {
+  padding: 3px;
+  display: inline-block;
+  width: 60px;
+  text-decoration: none;
+  margin-left: 5px;
+  background-color: #336633;
+  border: none;
 }
 
 #submit input:hover {
@@ -152,3 +162,4 @@ input.small {
 .temp_box p.time {
   font-size: 150%;
   text-align: center;
+}
