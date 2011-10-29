@@ -58,10 +58,4 @@ void error_P(const char* str) {
     while(1);
 }
 
-// Grava o log no SD
-void logger() {
-    if ( sd_file.open(&sd_root, log_filename, O_CREAT | O_APPEND | O_WRITE ) ) {
-       sd_file.println("Oiiiii");
-       sd_file.close();
-    }
-}
+

@@ -132,7 +132,7 @@ void setup(){
   // Thermometer address
   sensors.getAddress(thermometer, 0);
   // alarm when temp is higher than 28C
-  sensors.setHighAlarmTemp(thermometer, 28);
+  sensors.setHighAlarmTemp(thermometer, 29);
   // alarm when temp is lower than 19C
   sensors.setLowAlarmTemp(thermometer, 19); 
   // set alarm handle
@@ -175,10 +175,13 @@ void loop(){
 
   t = rtc.time();
 
-  if ( t.sec == 0 ) {
-    Serial.println("Granvando log...");
+  // Minuto a minuto
+/*  if ( ( t.min % 10 ) == 0 ) {
+    Serial.print("LOGGER: ");
+    Serial.println(t.sec);
     logger();
   }
+*/
 
   // If no sensor alarm, turn of LED and BUZZER
   if ( !sensors.hasAlarm() ) {

@@ -15,7 +15,7 @@ boolean isGET(const char* _header){
 // Recebe um array do tipo char e o altera o seu conteúdo
 // colocando a data formada
 void format_datetime(char dt[], boolean csv) {
-  Time t = rtc.time();
+  memset(dt, 0, strlen(dt));
   if(csv)
     sprintf(dt, "%04d-%02d-%02d %02d:%02d:%02d", t.yr, t.mon, t.date, t.hr, t.min, t.sec);
   else
@@ -153,5 +153,22 @@ void processing_request( Client client ) {
         
         break;
       }
+    }
+}
+
+// Grava o log no SD
+void logger() {
+    // Solicita a temperatura atual
+    float current_temp = sensors.getTempCByIndex(0);
+    // Solicita a data/hora atual
+    char datetime[19];
+    format_datetime(datetime, false);
+
+    if ( sd_file.open(&sd_root, log_filename, O_CREAT | O_APPEND | O_WRITE ) ) {
+       sd_file.print(datetime);
+       sd_file.print(";");
+       sd_file.print(current_temp);
+       sd_file.println();
+       sd_file.close();
     }
 }
