@@ -1,20 +1,16 @@
-/********************************************************************************
- *                    INCLUDING LIBRARIES
- ********************************************************************************/
+// Incluindo bibliotecas
 #include <SPI.h>
 #include <Ethernet.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <DS1302.h>
 #include <SD.h>
-// Include the file configuration
+
+// Configurações
 #include "config.h"
 
-// Some variables
-char line_header[100];
-char content_length[64];
-int index = 0;
-float current_temp;
+// Incluindo funções de uso
+#include "func.h"
 
 // Alarm handler, should turn on the LED pin if some alarm is handled
 void alarm_handler(uint8_t* device_address) {
@@ -24,6 +20,7 @@ void alarm_handler(uint8_t* device_address) {
   tone(BUZZ_PIN, 10, 5000);
 }
 
+/*
 void render_html(Client client) {
   char *filename;
   boolean returnCSV = false;
@@ -115,6 +112,7 @@ void render_html(Client client) {
 
   }
 }
+*/
 
 // Arduino Setup
 void setup(){
@@ -134,7 +132,7 @@ void setup(){
   // Thermometer address
   sensors.getAddress(thermometer, 0);
   // alarm when temp is higher than 28C
-  sensors.setHighAlarmTemp(thermometer, 25);
+  sensors.setHighAlarmTemp(thermometer, 28);
   // alarm when temp is lower than 19C
   sensors.setLowAlarmTemp(thermometer, 19); 
   // set alarm handle
@@ -192,12 +190,10 @@ void loop(){
   Client client = server.available();
 
   if ( client ) {
-      boolean blank = true;
-      boolean returnJson = false;
-      index = 0;
-      current_temp = 0;
-      memset(line_header, 0, 100);
-
+      //memset(line_header, 0, 100);
+      processing_request(client);
+      
+      /*
       while( client.connected() ){
         if( client.available() ){
           char c = client.read();
@@ -224,37 +220,36 @@ void loop(){
           }
           break;
 
-/*
-          if( c == '\n' ) {
-            blank = true;
-            Serial.println(line_header);
-
-            if ( line_header.indexOf("Content-Length:") >= 0 ) {
-              line_header.substring(16).toCharArray(content_length, 64); 
-              Serial.print("Tamanho: ");
-              Serial.println(atoi(content_length));
-            }
-
-            // Check what was passed by URL
-            if( line_header.indexOf("led=1") > 0 )
-              digitalWrite(LED_PIN, HIGH);
-
-            if( line_header.indexOf("led=0") >0 )
-              digitalWrite(LED_PIN, LOW);
-
-            if ( line_header.indexOf("?token=1qaz2wsx") > 0 && line_header.indexOf("GET /getTemperature") > 0 )
-              returnJson = true;
-
-            line_header = "";
-
-          } else {
-              if( c != '\r' ) {
-                blank = false;
-              } 
-          }
-*/
+//          if( c == '\n' ) {
+//            blank = true;
+//            Serial.println(line_header);
+//
+//            if ( line_header.indexOf("Content-Length:") >= 0 ) {
+//              line_header.substring(16).toCharArray(content_length, 64); 
+//              Serial.print("Tamanho: ");
+//              Serial.println(atoi(content_length));
+//            }
+//
+//            // Check what was passed by URL
+//            if( line_header.indexOf("led=1") > 0 )
+//              digitalWrite(LED_PIN, HIGH);
+//
+//            if( line_header.indexOf("led=0") >0 )
+//              digitalWrite(LED_PIN, LOW);
+//
+//            if ( line_header.indexOf("?token=1qaz2wsx") > 0 && line_header.indexOf("GET /getTemperature") > 0 )
+//              returnJson = true;
+//
+//            line_header = "";
+//
+//          } else {
+//              if( c != '\r' ) {
+//                blank = false;
+//              } 
+//          }
         }
       }
+      */
       delay(1);
       client.stop();
   }
