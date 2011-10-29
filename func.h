@@ -132,7 +132,7 @@ void processing_request( Client client ) {
     // da página é realizado
     while( client.connected() ){
 
-      if( client.available() ){
+      if( client.available() ) {
         char c = client.read();
 
         // Se não é fim de linha então leia o byte,
