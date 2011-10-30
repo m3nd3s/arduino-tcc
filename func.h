@@ -24,15 +24,9 @@ void format_datetime(char dt[], boolean csv) {
 
 // Rederiza corretamente a requisção do cliente.
 // Lê o arquivo correspondente no cartão SD
-void render_html(const char *_header, Client client){
-  const char *filename;
+void render_html(const char *filename, Client client, boolean isGET){
   boolean isCSV = false;
   
-  // Isto é um truque para facilitar a leitura e identificação do arquivo
-  // retirado das instruções do Arduino.cc
-  filename = _header + 5;
-  (strstr(_header, " HTTP"))[0] = 0;
-
   // Identifica se foi passado algum arquivo, caso contrário
   // carregue o index.htm
   //
@@ -123,34 +117,69 @@ void render_html(const char *_header, Client client){
 // Método responsável por processar a requisição do cliente
 // retornando a página solicitada e/ou erro correspondente
 void processing_request( Client client ) {
+
     // Controle do array de chars header
     byte index = 0;
-    char header[100];
+    byte i = 0;
+    char header[HTTP_HEADER_SIZE];
+    boolean isGET = true;
+    const char *filename;
+    char html_filename[12];
 
-    // Loop de conexão
-    // Enquanto o cliente estiver conectado o processamento
-    // da página é realizado
-    while( client.connected() ){
+    // Cliente conectado?
+    if ( client.connected() ){
 
-      if( client.available() ) {
+      // Leia os dados enviados e depois execute o processamento
+      // da requisição
+      while ( client.available() ) {
         char c = client.read();
 
-        // Se não é fim de linha então leia o byte,
-        // faça o append no array line_header e pule o loop para
-        // o próximo byte
+        // Modificar aqui para ler o header HTTP inteiro
+
+        // Monta a string com os dados da requisição
         if ( c != '\n' && c != '\r' ) {
-          header[index++] = c;
-          continue;
+          if( index < HTTP_HEADER_SIZE )
+            header[index++] = c;
+        } else {
+          if( c == '\r' ) {
+            // Checa a primeira linha da requisição
+            if( i == 0 ) {
+              isGET = ( strstr( header, "GET" ) != NULL );
+
+              // Isto é um truque para facilitar a leitura e identificação do arquivo
+              // retirado das instruções do Arduino.cc
+              filename = (isGET) ? ( header + 5 ) : ( header + 6 );
+
+              (strstr(header, " HTTP/1."))[0] = 0;
+              strcpy(html_filename, filename);
+            }
+
+            i++;
+          }
+
+          // Zera o contador e limpa o array utilizado para ler o cabeçalho
+          // HTTP
+          index = 0;
+          memset(&header, 0, HTTP_HEADER_SIZE);
         }
-        
-        // Adiciona null ao final do header
-        header[index] = 0;
-        index = 0;
-        // Renderiza o html
-        render_html(header, client);
-        
-        break;
       }
+
+      if ( !isGET ) {
+        //header[strlen(header)] = 0; // Adiciona fim de linha
+        Serial.println(strlen(header));
+        Serial.print("POST DATA: ");
+        Serial.println(header);
+      }
+      
+      Serial.print("FILE: ");
+      Serial.println(html_filename);
+
+      // Renderiza o html
+      render_html(html_filename, client, isGET);
+
+      // Disconnect
+      delay(1);
+      client.stop();
     }
 }
 
