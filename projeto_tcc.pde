@@ -30,9 +30,9 @@ void setup(){
   // Thermometer address
   sensors.getAddress(thermometer, 0);
   // alarm when temp is higher than 28C
-  sensors.setHighAlarmTemp(thermometer, 29);
+  sensors.setHighAlarmTemp(thermometer, MAX_TEMPERATURE);
   // alarm when temp is lower than 19C
-  sensors.setLowAlarmTemp(thermometer, 19); 
+  sensors.setLowAlarmTemp(thermometer, MIN_TEMPERATURE); 
   // set alarm handle
   sensors.setAlarmHandler(&alarm_handler);
 
@@ -90,9 +90,6 @@ void loop(){
   Client client = server.available();
 
   if ( client ) {
-      //memset(line_header, 0, 100);
       processing_request(client);
-      delay(1);
-      client.stop();
   }
 }
