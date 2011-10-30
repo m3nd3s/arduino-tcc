@@ -5,6 +5,7 @@ byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 192, 168, 1, 200 };
 Server server(80);
 
+#define HTTP_HEADER_SIZE 254
 
 /********************************************************************************
  *                    RTC DS1302 CONFIGURATION
@@ -21,6 +22,8 @@ DS1302 rtc(CE_PIN, IO_PIN, SCLK_PIN);
  ********************************************************************************/
 #define ONE_WIRE_BUS 2
 #define TEMPERATURE_PRECISION 9
+#define MAX_TEMPERATURE 31
+#define MIN_TEMPERATURE 19
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 DeviceAddress thermometer;
