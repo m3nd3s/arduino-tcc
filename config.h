@@ -22,11 +22,13 @@ DS1302 rtc(CE_PIN, IO_PIN, SCLK_PIN);
  ********************************************************************************/
 #define ONE_WIRE_BUS 2
 #define TEMPERATURE_PRECISION 9
-#define MAX_TEMPERATURE 31
-#define MIN_TEMPERATURE 19
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 DeviceAddress thermometer;
+
+// Temperaturas máximas e mínimas padrão
+#define MAX_TEMPERATURE 31
+#define MIN_TEMPERATURE 19
 
 
 /********************************************************************************
