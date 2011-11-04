@@ -1,0 +1,33 @@
+<%= form_for @notification do |f| %>
+  <fieldset>
+    <legend>Notifica&ccedil;&atilde;o</legend>
+
+    <div class="clearfix">
+      <%= f.label :interval, nil, :class => "obligatory" %>
+      <div class="input">
+        <%= f.select :interval, options_for_select(1..60) %>
+        <span class="help-block"><strong>Nota:</strong> Tempo em minutos</span>
+      </div>
+    </div>
+
+    <div class="clearfix">
+      <%= f.label :by, nil, :class => "obligatory" %>
+      <div class="input">
+        <%= f.select :by, options_for_select([["E-mail", "email"], ["SMS", "sms"]], @notification.by), :include_blank => true %>
+      </div>
+    </div>
+
+    <div class="clearfix">
+      <%= f.label :using, nil, :class => "obligatory" %>
+      <div class="input">
+        <%= f.text_field :using %>
+      </div>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "Salvar", :class => "btn primary" %>
+      <%= button_tag "Cancelar", :type => :reset, :class => "btn" %>
+    </div>
+
+  </fieldset>
+<% end %>

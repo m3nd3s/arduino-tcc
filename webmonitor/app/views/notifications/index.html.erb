@@ -1,0 +1,38 @@
+<div class="page-header">
+  <h1>Notifica&ccedil;&otilde;es</h1>
+</div>
+
+<div class="row">
+
+  <div class="span14">
+    <table class="zebra-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Tipo</th>
+          <th>Para</th>
+          <th>Intervalo</th>
+          <th>A&ccedil;&otilde;es</th>
+        </tr>
+      </thead>
+      <% @notifications.each do |n| %>
+        <tr>
+        <td><%= n.id %></td>
+        <td><%= n.by %></td>
+        <td><%= n.using %></td>
+        <td><%= n.interval %></td>
+        <td>
+          <%= link_to "R", notifications_path(n), :method => :delete, :confirm => "Está certo disto?", :class => "btn danger" %>
+          <%= link_to "E", edit_notification_path(n), :class => "btn success" %>
+        </td>
+      </tr>
+    <% end %>
+    </table>
+
+    <div class="actions">
+      <%= link_to "Nova Notificação", new_notification_path, :class => "btn primary" %>
+    </div>
+
+  </div>
+
+</div>

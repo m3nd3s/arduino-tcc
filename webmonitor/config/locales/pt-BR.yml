@@ -63,6 +63,7 @@
       default: "%A, %d de %B de %Y, %H:%M h"
       short: "%d/%m, %H:%M h"
       long: "%A, %d de %B de %Y, %H:%M h"
+      normal: "%d/%m/%Y %H:%M:%S"
     am: ''
     pm: ''
 
@@ -241,9 +242,18 @@
       system_configuration:
         interval: "Intervalo"
         refresh_interval: "Intervalo de refresh"
-        token: "Chave secreta"
         critical_level: "Nível Crítico"
       notification:
         by: "Tipo"
         using: "Para"
         interval: "Intervalo"
+      sensor:
+        description: "Descrição"
+        max_temperature: "Temperatura máxima"
+        min_temperature: "Temperatura mínima"
+        ip_address: "Endereço IP"
+        token: "Chave secreta"
+      user:
+        email: "E-mail"
+        password: "Senha"
+        password_confirmation: "Confirmação"

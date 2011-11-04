@@ -1,0 +1,35 @@
+<%= form_for @sensor do |f| %>
+  <fieldset>
+  <legend>Sensor</legend>
+
+  <div class="clearfix">
+    <%= f.label :description, nil, :class => "obligatory" %>
+    <div class="input">
+      <%= f.text_field :description %>
+      <span class="help-block"><strong>Nota:</strong> Nome ou local</span>
+    </div>
+  </div>
+
+  <div class="clearfix">
+    <%= f.label :ip_address, nil, :class => "obligatory" %>
+    <div class="input">
+      <%= f.text_field :ip_address %>
+      <span class="help-block"><strong>Nota:</strong> Endere&ccedil;o IP do dispositivo</span>
+    </div>
+  </div>
+
+  <div class="clearfix">
+    <%= f.label :token, nil, :class => "obligatory" %>
+    <div class="input">
+      <%= f.text_field :token, :class => "xlarge" %>
+      <span class="help-block"><strong>Nota:</strong> n&atilde;o utilize espa&ccedil;os em branco</span>
+    </div>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Salvar", :class => "btn primary" %>
+    <%= button_tag "Cancelar", :type => :reset, :class => "btn" %>
+  </div>
+
+</fieldset>
+<% end %>

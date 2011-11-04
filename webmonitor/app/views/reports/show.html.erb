@@ -1,0 +1,42 @@
+<div class="page-header">
+  <h1>Hist&oacute;rico de Temperaturas</h1>
+</div>
+
+<div class="row">
+
+    <div class="actions">
+      
+    <%= form_tag "teste" do %>
+      <%= collection_select nil, :sensor, Sensor.all, :id, :description, :include_blank => "Selecione o Sensor" %>
+      <%= text_field_tag :blah, nil, :placeholder => "Data/Hora Início", :class => "small" %>
+      <%= text_field_tag :blah, nil, :placeholder => "Data/Hora Fim", :class => "small" %>
+      <%= submit_tag "Filtrar", :class => "btn primary" %>
+    <% end %>
+  </div>
+
+  <div class="span14">
+    <%= link_to "Exportar CSV", "#", :class => "btn success", :style => "float: right;" %>  
+  </div>
+  &nbsp;
+
+  <div class="span14">
+
+    <table class="zebra-striped" id="temperatures_table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Data/Hora</th>
+          <th>Temperatura</th>
+        </tr>
+      </thead>
+      <% @temperatures.each_with_index do |t,i| %>
+        <tr>
+        <td><%= i + 1 %></td>
+        <td><%= l t.checked_at, :format => :normal %></td>
+        <td><%= number_to_human t.value, :precision => 2 %>&ordm; C</td>
+      </tr>
+    <% end %>
+    </table>
+
+  </div>
+</div>

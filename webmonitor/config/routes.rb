@@ -9,7 +9,11 @@ Webmonitor::Application.routes.draw do
   match "current_temperature" => "dashboard#current_temperature", :as => :current_temperature
 
   resource :system_configurations
+  resource :charts
+  resource :reports
   resources :notifications
+  resources :sensors
+  resources :roles
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

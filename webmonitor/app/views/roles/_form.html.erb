@@ -1,0 +1,32 @@
+<%= form_for @user, :url => roles_path do |f| %>
+  <fieldset>
+    <legend>Usu&aacute;rio</legend>
+
+    <div class="clearfix">
+      <%= f.label :email, nil, :class => "obligatory" %>
+      <div class="input">
+        <%= f.text_field :email %>
+      </div>
+    </div>
+
+    <div class="clearfix">
+      <%= f.label :password, nil, :class => "obligatory" %>
+      <div class="input">
+        <%= f.password_field :email %>
+      </div>
+    </div>
+
+    <div class="clearfix">
+      <%= f.label :password_confirmation, nil, :class => "obligatory" %>
+      <div class="input">
+        <%= f.password_field :password_confirmation %>
+      </div>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "Salvar", :class => "btn primary" %>
+      <%= button_tag "Cancelar", :type => :reset, :class => "btn" %>
+    </div>
+
+  </fieldset>
+<% end %>
