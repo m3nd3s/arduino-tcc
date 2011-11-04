@@ -56,3 +56,7 @@
   font-size: 200%;
   margin: auto;
 }
+
+.obligatory {
+  font-weight: bold;
+}

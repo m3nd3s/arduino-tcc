@@ -11,7 +11,15 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111016122911) do
+ActiveRecord::Schema.define(:version => 20111103213331) do
+
+  create_table "notifications", :force => true do |t|
+    t.string   "by"
+    t.string   "using"
+    t.integer  "interval"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "sensors", :force => true do |t|
     t.integer  "sid"
@@ -19,10 +27,22 @@ ActiveRecord::Schema.define(:version => 20111016122911) do
     t.string   "description"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.float    "max_temperature"
+    t.float    "min_temperature"
+    t.boolean  "alert"
+  end
+
+  create_table "system_configurations", :force => true do |t|
+    t.integer  "interval"
+    t.integer  "refresh_interval"
+    t.string   "token"
+    t.float    "critical_level"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "temperatures", :force => true do |t|
-    t.datetime "checking"
+    t.datetime "checked_at"
     t.float    "value"
     t.datetime "created_at"
     t.datetime "updated_at"

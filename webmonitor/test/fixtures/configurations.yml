@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  interval: 1
+  refresh_interval: 1
+  token: MyString
+  critical_temperature: 1.5
+
+two:
+  interval: 1
+  refresh_interval: 1
+  token: MyString
+  critical_temperature: 1.5

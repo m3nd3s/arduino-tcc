@@ -24,7 +24,7 @@ void format_datetime(char dt[], boolean csv) {
 
 // Rederiza corretamente a requisção do cliente.
 // Lê o arquivo correspondente no cartão SD
-void render_html(const char *filename, Client client, boolean isGET){
+boolean render_html(Client client, const char *filename, boolean isGET){
   boolean isCSV = false;
   
   // Identifica se foi passado algum arquivo, caso contrário
@@ -52,8 +52,12 @@ void render_html(const char *filename, Client client, boolean isGET){
   // Requisição de arquivo normal
   if ( !isCSV) {
     // Tenta abrir o arquivo para leitura
+    Serial.print("Lendo arquivo: ");
+    Serial.println(filename);
     if ( !sd_file.open(&sd_root, filename, O_READ ) ) {
       file_not_found(client);
+      delay(1); // aguarda um tempo
+      return false;
     }
 
     client.println("HTTP/1.1 200 OK");
@@ -112,6 +116,46 @@ void render_html(const char *filename, Client client, boolean isGET){
     //sprintf(csv, "%04d-%02d-%02d %02d:%02d:%02d,%d.%02d", t.yr, t.mon, t.date, t.hr, t.min, t.sec, d1, d2);
     client.println(csv);
   }
+
+  return true;
+}
+
+void processing_action(const char *post_data) {
+  // Matriz de dados
+  char params[15][15];
+  byte j, k = 0;
+
+  Serial.println("Processando POST");
+
+  // Processando os dados enviados
+  byte t = strlen(post_data);
+  for ( byte i=0; i < t; i++ ){
+
+    // Pega a chave e valor e armazena em uma matriz de 15x15
+    //
+    // Que significa que teremos no máximo 15 variáveis (parâmetros) de tamanho
+    // máximo 15 bytes (caracteres)
+    if ( post_data[i] != '=' && post_data[i] != '&' ) {
+      params[j][k++] = post_data[i];
+    } else {
+      // Adiciona null ao final
+      params[j][k] = 0;
+      Serial.println(params[j]);
+      j++; k = 0;
+    }
+
+  }
+
+  // Processamento da configuração de dada e hora
+  //if( strstr(filename, "time.htm") != NULL ){
+    //uint8_t year = data.substring(data.indexOf("year")+4,  );
+    
+    // Set the datetime based on parameters
+    //Time t(year, month, date, hour, min, sec, 0);
+
+    /* Set the time and date on the chip */
+    //rtc.time(t);
+  //}
 }
 
 // Método responsável por processar a requisição do cliente
@@ -164,18 +208,19 @@ void processing_request( Client client ) {
         }
       }
 
+      // Caso a requisição seja do tipo POST deve ser feito o processamento da requisição
       if ( !isGET ) {
-        //header[strlen(header)] = 0; // Adiciona fim de linha
-        Serial.println(strlen(header));
+        // Debug, remover isto
         Serial.print("POST DATA: ");
         Serial.println(header);
+        processing_action(header);
       }
       
       Serial.print("FILE: ");
       Serial.println(html_filename);
 
       // Renderiza o html
-      render_html(html_filename, client, isGET);
+      render_html(client, html_filename, isGET);
 
       // Disconnect
       delay(1);

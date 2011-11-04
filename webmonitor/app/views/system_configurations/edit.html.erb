@@ -1,0 +1,72 @@
+<div class="page-header">
+  <h1>Configura&ccedil;&otilde;es</h1>
+</div>
+
+<div class="row">
+  <div class="span10">
+
+    <%= form_for @configuration do |f| %>
+      <fieldset>
+        <legend>Configura&ccedil;&atilde;es gerais</legend>
+
+        <div class="clearfix">
+          <%= f.label :interval, nil, :class => "obligatory" %>
+          <div class="input">
+            <%= f.select :interval, options_for_select(1..60) %>
+            <span class="help-block"><strong>Nota:</strong> Tempo em minutos</span>
+          </div>
+        </div>
+
+        <div class="clearfix">
+          <%= f.label :refresh_interval %>
+          <div class="input">
+            <%= f.text_field :refresh_interval %>
+            <span class="help-block"><strong>Nota:</strong> Tempo em minutos</span>
+          </div>
+        </div>
+
+        <div class="clearfix">
+          <%= f.label :token, nil, :class => "obligatory" %>
+          <div class="input">
+            <%= f.text_field :token, :class => "xlarge" %>
+            <span class="help-block"><strong>Nota:</strong> n&atilde;o utilize espa&ccedil;os em branco</span>
+          </div>
+        </div>
+
+        <div class="clearfix">
+          <%= f.label :critical_level %>
+          <div class="input">
+            <%= f.text_field :critical_level %>
+            <span class="help-block"><strong>Nota:</strong> Em graus celsius</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <%= f.submit "Salvar", :class => "btn primary" %>
+          <%= button_tag "Cancelar", :type => :reset, :class => "btn" %>
+        </div>
+
+      </fieldset>
+    <% end %>
+  </div>
+
+  <div class="span4">
+    <h2>Descri&ccedil;&atilde;o</h2>
+    <dl>
+
+      <dt>Intervalo</dt>
+      <dd>Intervalo de tempo, em minutos, que o sistema buscar&aacute; informa&ccedil;&otilde;es nos dispositivos.</dd>
+
+      <dt>Intervalo de refresh</dt>
+      <dd>Intervalo de tempo, em minutos, utilizado para dar reload na p&aacute;gina home para atualiza&ccedil;&atilde;o.</dd>
+
+      <dt>Chave secreta</dt>
+      <dd>Chave secreta utilizada para a comunica&ccedil;&atilde;o segura entre o sistema supervisor e os dispositivos (sensores).</dd>
+
+      <dt>N&iacute;vel Cr&iacute;tico</dt>
+      <dd>N&uacute;mero, em graus Celsius, que ser&aacute; aplicado &agrave;s temperaturas m&aacute;xima e m&iacute;nima para enviar as notifica&ccedil;&otilde;es.</dd>
+
+    </dl>
+  </div>
+
+</div>

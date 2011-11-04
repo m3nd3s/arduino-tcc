@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/Fixtures.html
+
+one:
+  by: MyString
+  using: MyString
+  interval: 1
+
+two:
+  by: MyString
+  using: MyString
+  interval: 1
