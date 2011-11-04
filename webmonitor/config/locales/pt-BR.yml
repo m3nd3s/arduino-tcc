@@ -243,3 +243,7 @@
         refresh_interval: "Intervalo de refresh"
         token: "Chave secreta"
         critical_level: "Nível Crítico"
+      notification:
+        by: "Tipo"
+        using: "Para"
+        interval: "Intervalo"
