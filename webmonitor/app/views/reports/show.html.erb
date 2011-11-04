@@ -7,7 +7,7 @@
     <div class="actions">
       
     <%= form_tag "teste" do %>
-      <%= collection_select nil, :sensor, Sensor.all, :id, :description, :include_blank => "Selecione o Sensor" %>
+      <%= collection_select nil, :sensor, Sensor.all, :id, :description, :include_blank => "Selecione o Dispositivo" %>
       <%= text_field_tag :blah, nil, :placeholder => "Data/Hora Início", :class => "small" %>
       <%= text_field_tag :blah, nil, :placeholder => "Data/Hora Fim", :class => "small" %>
       <%= submit_tag "Filtrar", :class => "btn primary" %>

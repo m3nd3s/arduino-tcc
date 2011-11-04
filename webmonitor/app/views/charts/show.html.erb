@@ -44,7 +44,7 @@
         borderWidth: 0
       },
 
-      series: [{ name: 'Sensor 1', data:[<%= @temperatures_to_chart.join(",") %>]}]
+      series: [{ name: 'Frios', data:[<%= @temperatures_to_chart.join(",") %>]}]
     });
       $("#current_temperature > span").load("<%= current_temperature_path %>");
   });

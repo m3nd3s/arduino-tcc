@@ -1,6 +1,6 @@
 <%= form_for @sensor do |f| %>
   <fieldset>
-  <legend>Sensor</legend>
+  <legend>Dispositivo</legend>
 
   <div class="clearfix">
     <%= f.label :description, nil, :class => "obligatory" %>
@@ -29,6 +29,7 @@
   <div class="actions">
     <%= f.submit "Salvar", :class => "btn primary" %>
     <%= button_tag "Cancelar", :type => :reset, :class => "btn" %>
+    <%= button_tag "Recarregar Informações", :type => :button, :class => "btn info" %>
   </div>
 
 </fieldset>

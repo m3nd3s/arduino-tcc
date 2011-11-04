@@ -3,16 +3,16 @@
     <div class="container">
       <%= link_to "Servidor de Dados e Monitoramento", dashboard_path, :class => "brand" %>
       <ul class="nav">
-        <li class="active"><a href="#">Home</a></li>
-        <li><%= link_to "Relatórios", reports_path %></li>
-        <li><%= link_to "Gráficos", charts_path %></li>
-        <li><%= link_to "Dispositivos", sensors_path %></li>
+        <li class="<%= current_css(:dashboard) %>"><%= link_to "Home", dashboard_path %></li>
+        <li class="<%= current_css(:reports) %>"><%= link_to "Relatórios", reports_path %></li>
+        <li class="<%= current_css(:charts) %>"><%= link_to "Gráficos", charts_path %></li>
+        <li class="<%= current_css(:sensors) %>"><%= link_to "Dispositivos", sensors_path %></li>
         <li class="dropdown">
         <a class="dropdown-toggle" href="#contact">Configura&ccedil;&otilde;es</a>
         <ul class="dropdown-menu">
-          <li><%= link_to "Geral", edit_system_configurations_path %></li>
-          <li><%= link_to "Notificações", notifications_path %></li>
-          <li><%= link_to "Usuários", roles_path %></li>
+          <li class="<%= current_css(:system_configurations) %>"><%= link_to "Geral", edit_system_configurations_path %></li>
+          <li class="<%= current_css(:notifications) %>"><%= link_to "Notificações", notifications_path %></li>
+          <li class="<%= current_css(:roles) %>"><%= link_to "Usuários", roles_path %></li>
         </ul>
         </li>
       </ul>
