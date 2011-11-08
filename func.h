@@ -122,8 +122,8 @@ boolean render_html(Client client, const char *filename, boolean isGET){
 
 void processing_action(const char *post_data) {
   // Matriz de dados
-  char params[15][15];
-  byte j, k = 0;
+  //char params[25][20];
+  //byte j, k = 0;
 
   Serial.println("Processando POST");
 
@@ -131,20 +131,18 @@ void processing_action(const char *post_data) {
   byte t = strlen(post_data);
   for ( byte i=0; i < t; i++ ){
 
-    // Pega a chave e valor e armazena em uma matriz de 15x15
-    //
-    // Que significa que teremos no máximo 15 variáveis (parâmetros) de tamanho
-    // máximo 15 bytes (caracteres)
     if ( post_data[i] != '=' && post_data[i] != '&' ) {
-      params[j][k++] = post_data[i];
+      //params[j][k++] = post_data[i];
+      Serial.print(post_data[i]);
     } else {
       // Adiciona null ao final
-      params[j][k] = 0;
-      Serial.println(params[j]);
-      j++; k = 0;
+      //params[j][k] = '\0';
+      Serial.println();
+      //j++; k = 0;
     }
 
   }
+  Serial.println("Acabou o processamento.............");
 
   // Processamento da configuração de dada e hora
   //if( strstr(filename, "time.htm") != NULL ){
@@ -185,6 +183,7 @@ void processing_request( Client client ) {
           if( index < HTTP_HEADER_SIZE )
             header[index++] = c;
         } else {
+          header[index] = '\0';
           if( c == '\r' ) {
             // Checa a primeira linha da requisição
             if( i == 0 ) {
