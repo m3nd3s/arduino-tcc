@@ -61,8 +61,6 @@ void setup(){
   if (!sd_card.init(SPI_HALF_SPEED, SD_SS_PIN)) error("card.init failed!");
   if (!sd_volume.init(&sd_card)) error("vol.init failed!");
   if (!sd_root.openRoot(&sd_volume)) error("openRoot failed");
-  //sd_root.ls(LS_DATE | LS_SIZE);
-  //sd_root.ls(LS_R);
 }
 
 void loop(){

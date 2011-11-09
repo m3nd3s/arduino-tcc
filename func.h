@@ -15,7 +15,6 @@ boolean isGET(const char* _header){
 // Recebe um array do tipo char e o altera o seu conteúdo
 // colocando a data formada
 void format_datetime(char dt[], boolean csv) {
-  memset(dt, 0, strlen(dt));
   if(csv)
     sprintf(dt, "%04d-%02d-%02d %02d:%02d:%02d", t.yr, t.mon, t.date, t.hr, t.min, t.sec);
   else
@@ -40,14 +39,6 @@ boolean render_html(Client client, const char *filename, boolean isGET){
 
   // Get temperature and time
   float current_temp = sensors.getTempCByIndex(0);
-  
-  char datetime[19];
-  format_datetime(datetime, false);
-  //int d1 = current_temp;
-  //float f = current_temp - d1;
-  //int d2 = f * 100;
-  //sprintf(date, "%02d-%02d-%04d", t.date, t.mon, t.yr);
-  //sprintf(time, "%02d:%02d:%02d", t.hr, t.min, t.sec);
   
   // Requisição de arquivo normal
   if ( !isCSV) {
@@ -99,7 +90,9 @@ boolean render_html(Client client, const char *filename, boolean isGET){
         if ( keyword.equals( "{temp}" ) )
           client.print(current_temp);
         else if(keyword.equals( "{date}" )) // Caso ache {date}, substitua pela data/hora atual
-          client.print(datetime);
+          sprintf(dt, "%04d-%02d-%02d %02d:%02d:%02d", t.yr, t.mon, t.date, t.hr, t.min, t.sec);
+          client.print(t.date);
+          client.print("-");
         else
           client.print(keyword);
         
@@ -120,41 +113,23 @@ boolean render_html(Client client, const char *filename, boolean isGET){
   return true;
 }
 
-void processing_action(const char *post_data) {
-  // Matriz de dados
-  //char params[25][20];
-  //byte j, k = 0;
-
-  Serial.println("Processando POST");
-
-  // Processando os dados enviados
-  byte t = strlen(post_data);
-  for ( byte i=0; i < t; i++ ){
-
-    if ( post_data[i] != '=' && post_data[i] != '&' ) {
-      //params[j][k++] = post_data[i];
-      Serial.print(post_data[i]);
-    } else {
-      // Adiciona null ao final
-      //params[j][k] = '\0';
-      Serial.println();
-      //j++; k = 0;
+void processing_action(const char *post_data, const char *filename) {
+  Serial.println("Processando POST................");
+  // Processando os dados enviados e salvando no arquivo
+  if ( sd_file.open(&sd_root, "config.ard", O_CREAT | O_APPEND | O_WRITE ) ) {
+    byte t = strlen(post_data);
+    for ( byte i=0; i < t; i++ ){
+      if ( post_data[i] != '&' ) {
+        sd_file.print(post_data[i]);
+      } else {
+        sd_file.println();
+      }
     }
-
+   sd_file.close();
   }
   Serial.println("Acabou o processamento.............");
 
-  // Processamento da configuração de dada e hora
-  //if( strstr(filename, "time.htm") != NULL ){
-    //uint8_t year = data.substring(data.indexOf("year")+4,  );
-    
-    // Set the datetime based on parameters
-    //Time t(year, month, date, hour, min, sec, 0);
-
-    /* Set the time and date on the chip */
-    //rtc.time(t);
-  //}
-}
+ }
 
 // Método responsável por processar a requisição do cliente
 // retornando a página solicitada e/ou erro correspondente
@@ -212,7 +187,7 @@ void processing_request( Client client ) {
         // Debug, remover isto
         Serial.print("POST DATA: ");
         Serial.println(header);
-        processing_action(header);
+        processing_action(header, html_filename);
       }
       
       Serial.print("FILE: ");
@@ -227,6 +202,7 @@ void processing_request( Client client ) {
     }
 }
 
+/*
 // Grava o log no SD
 void logger() {
     // Solicita a temperatura atual
@@ -243,6 +219,7 @@ void logger() {
        sd_file.close();
     }
 }
+*/
 
 // Função chamada quando um alarme é ativado nos sensores de temperatura
 void alarm_handler(uint8_t* device_address) {
@@ -252,4 +229,22 @@ void alarm_handler(uint8_t* device_address) {
   tone(BUZZ_PIN, 10, 5000);
 }
 
+/*
+void load_configuration() {
+  char key[8];
+  char c;
+  if ( sd_file.open(&sd_root, "config.ard", O_READ ) ) {
+    byte i, j = 0;
 
+    while( ( c = sd_file.read() ) > 0 ) {
+      if ( c != '=' && c != '\n' && c != '\r' ) {
+        key[i++] = c;
+      } else {
+        strcpy(configuration[j], key);
+        // reset
+        memset(&key, 0, i); i = 0; j++;
+      }
+    }
+  }
+}
+*/

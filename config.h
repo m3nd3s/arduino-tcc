@@ -4,8 +4,18 @@
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 192, 168, 1, 200 };
 Server server(80);
-
 #define HTTP_HEADER_SIZE 254
+
+// Configuração baseada na posição da linha
+char configuration[8][8];
+#define DESC   0;
+#define USER   1;
+#define PASS   2;
+#define TOKEN  3;
+#define IP     4;
+#define MAC    5;
+#define GATEW  6;
+#define MASK   7;
 
 /********************************************************************************
  *                    RTC DS1302 CONFIGURATION
