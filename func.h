@@ -12,15 +12,6 @@ boolean isGET(const char* _header){
   return strstr(_header, "GET /") != NULL;
 }
 
-// Recebe um array do tipo char e o altera o seu conteúdo
-// colocando a data formada
-void format_datetime(char dt[], boolean csv) {
-  if(csv)
-    sprintf(dt, "%04d-%02d-%02d %02d:%02d:%02d", t.yr, t.mon, t.date, t.hr, t.min, t.sec);
-  else
-    sprintf(dt, "%02d-%02d-%04d %02d:%02d:%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec);
-}
-
 // Rederiza corretamente a requisção do cliente.
 // Lê o arquivo correspondente no cartão SD
 boolean render_html(Client client, const char *filename, boolean isGET){
@@ -69,54 +60,137 @@ boolean render_html(Client client, const char *filename, boolean isGET){
 
     // Leitura do arquivo no cartão SD
     char _c;
-    String keyword = "";
-    boolean key = false;
+    char keyword[8] = "";
+    boolean capture = false;
+    byte i = 0;
 
     // Read file from SD Card
     while( ( _c = sd_file.read() ) > 0 ) {
-      if (_c == '{' ) key = true;
-      if ( key )
-        keyword += String(_c);
-      else
-        client.print( _c );
 
-      // Caso ache o fechamento de tag ou o tamanho for
-      // maior ou igual 16 (máximo), libera o buffer
-      if ( _c == '}' || keyword.length() >= 16 ) {
-        key = false;
+      if (_c == '{' ) capture = true;
 
-        // Se existe a chave {temp}, então substitua pela temperatura
-        // corrente
-        if ( keyword.equals( "{temp}" ) )
-          client.print(current_temp);
-        else if(keyword.equals( "{date}" )) // Caso ache {date}, substitua pela data/hora atual
-          sprintf(dt, "%04d-%02d-%02d %02d:%02d:%02d", t.yr, t.mon, t.date, t.hr, t.min, t.sec);
-          client.print(t.date);
-          client.print("-");
-        else
-          client.print(keyword);
+      // Somente se estiver capturando
+      if ( capture ) {
+
+        // Captura o caracter e incrementa o contador
+        keyword[i++] = _c;
         
-        keyword = "";
+        if ( i == 7 ) {
+          keyword[i] = '\0';
+          client.print(keyword);
+          i = 0;
+          capture = false;
+          memset(&keyword, '\0', 8);
+        } else {
+          // Checa se é fechamento de placeholder
+          if ( _c == '}' ) {
+            capture = false;
+            // Se existe a chave {temp}, então substitua pela temperatura
+            // corrente
+            if ( strstr(keyword, "{temp}") != NULL )
+              client.print(current_temp);
+            else if(strstr(keyword, "{date}") != NULL ) // Caso ache {date}, substitua pela data/hora atual
+              client.print("------");
+            else
+              client.print(keyword);
+            
+            i = 0;
+            memset(&keyword, '\0', 8);
+          }
+        }
+      } else {
+        client.print( _c );
       }
     } // Fim de leitura do SD
 
     sd_file.close(); // fecha o arquivo
 
   } else {
-    // Retorno no formato CSV
-    char csv[22];
-    format_datetime(csv, true);
-    //sprintf(csv, "%04d-%02d-%02d %02d:%02d:%02d,%d.%02d", t.yr, t.mon, t.date, t.hr, t.min, t.sec, d1, d2);
-    client.println(csv);
+    //client.println(csv);
   }
 
   return true;
 }
 
+void write_data_to_eeprom( const char* param, const char* value ){
+
+  byte count = strlen(value);
+  // Verifica o que veio do formulário
+  if( strstr(param, "description") != NULL ) {
+    for( byte i=0; i < count; i++ )
+      EEPROM.write( E_DESC+i, value[i] );
+  }
+
+  if( strstr(param, "user") != NULL ) {
+    for( byte i=0; i < count; i++ )
+      EEPROM.write( E_USER+i, value[i] );
+  }
+
+  if( strstr(param, "password") != NULL ) {
+    for( byte i=0; i < count; i++ )
+      EEPROM.write( E_PASS+i, value[i] );
+  }
+
+  if( strstr(param, "token") != NULL ) {
+    for( byte i=0; i < count; i++ )
+      EEPROM.write( E_TOKEN+i, value[i] );
+  }
+
+  if( strstr(param, "ip_address") != NULL ) {
+    for( byte i=0; i < count; i++ )
+      EEPROM.write( E_IP+i, value[i] );
+  }
+
+  if( strstr(param, "mac_address") != NULL ) {
+    for( byte i=0; i < count; i++ )
+      EEPROM.write( E_MAC+i, value[i] );
+  }
+
+  if( strstr(param, "gateway") != NULL ) {
+    for( byte i=0; i < count; i++ )
+      EEPROM.write( E_GATEW+i, value[i] );
+  }
+
+  if( strstr(param, "mask") != NULL ) {
+    for( byte i=0; i < count; i++ )
+      EEPROM.write( E_MASK+i, value[i] );
+  }
+
+}
+
 void processing_action(const char *post_data, const char *filename) {
   Serial.println("Processando POST................");
+
+  byte count = strlen(post_data);
+  byte j, k = 0;
+  char param[8] = ""; // 0 - 7
+  char value[100] = ""; // max 100
+  boolean p = true;
+
+  for( byte i=0; count; i++ ) {
+
+    if ( post_data[i] != '&' && post_data[i] != '=' ) {
+
+      if( p )
+        param[j++] = post_data[i]; 
+      else
+        value[k++] = post_data[i];
+
+    } else {
+
+      if( post_data[i] == '&' ) {
+        p = true;
+        j =0; k = 0;
+
+        write_data_to_eeprom(param, value);
+      } else {
+        p = false;
+      }
+    }
+  }
+
   // Processando os dados enviados e salvando no arquivo
-  if ( sd_file.open(&sd_root, "config.ard", O_CREAT | O_APPEND | O_WRITE ) ) {
+  /*if ( sd_file.open(&sd_root, "config.ard", O_CREAT | O_APPEND | O_WRITE ) ) {
     byte t = strlen(post_data);
     for ( byte i=0; i < t; i++ ){
       if ( post_data[i] != '&' ) {
@@ -126,7 +200,7 @@ void processing_action(const char *post_data, const char *filename) {
       }
     }
    sd_file.close();
-  }
+  }*/
   Serial.println("Acabou o processamento.............");
 
  }
@@ -136,8 +210,7 @@ void processing_action(const char *post_data, const char *filename) {
 void processing_request( Client client ) {
 
     // Controle do array de chars header
-    byte index = 0;
-    byte i = 0;
+    byte index = 0; // Controla o número de caracteres
     char header[HTTP_HEADER_SIZE];
     boolean isGET = true;
     const char *filename;
@@ -151,17 +224,22 @@ void processing_request( Client client ) {
       while ( client.available() ) {
         char c = client.read();
 
-        // Modificar aqui para ler o header HTTP inteiro
-
         // Monta a string com os dados da requisição
         if ( c != '\n' && c != '\r' ) {
+
           if( index < HTTP_HEADER_SIZE )
-            header[index++] = c;
+            header[index] = c;
+            index++;
+
         } else {
-          header[index] = '\0';
+
+          header[index] = 0;
+
           if( c == '\r' ) {
-            // Checa a primeira linha da requisição
-            if( i == 0 ) {
+
+            // Checa se é GET ou POST, isto só acontece na primeira linha do cabeçalho
+            if( strstr( header, "GET" ) || strstr(header, "POST") ) {
+              // é GET?
               isGET = ( strstr( header, "GET" ) != NULL );
 
               // Isto é um truque para facilitar a leitura e identificação do arquivo
@@ -172,7 +250,6 @@ void processing_request( Client client ) {
               strcpy(html_filename, filename);
             }
 
-            i++;
           }
 
           // Zera o contador e limpa o array utilizado para ler o cabeçalho

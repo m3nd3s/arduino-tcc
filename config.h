@@ -6,16 +6,15 @@ byte ip[] = { 192, 168, 1, 200 };
 Server server(80);
 #define HTTP_HEADER_SIZE 254
 
-// Configuração baseada na posição da linha
-char configuration[8][8];
-#define DESC   0;
-#define USER   1;
-#define PASS   2;
-#define TOKEN  3;
-#define IP     4;
-#define MAC    5;
-#define GATEW  6;
-#define MASK   7;
+// posições de memória na EEPROM
+#define E_DESC     0 // 100 chars
+#define E_USER   100 //  8 chars
+#define E_PASS   108 //  8 chars
+#define E_TOKEN  116 // 15 chars
+#define E_IP     131 //  4 bytes
+#define E_MAC    135 //  6 bytes
+#define E_GATEW  141 //  4 bytes
+#define E_MASK   145 //  4 bytes
 
 /********************************************************************************
  *                    RTC DS1302 CONFIGURATION
