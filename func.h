@@ -122,23 +122,33 @@ void write_data_to_eeprom( const char* param, const char* value ){
   }
 
   if( strstr(param, "user") != NULL ) {
+    Serial.println("Gravando Usuário.......");
     for( byte i=0; i < count; i++ )
       EEPROM.write( E_USER+i, value[i] );
   }
 
   if( strstr(param, "password") != NULL ) {
+    Serial.println("Gravando Senha.......");
     for( byte i=0; i < count; i++ )
       EEPROM.write( E_PASS+i, value[i] );
   }
 
   if( strstr(param, "token") != NULL ) {
+    Serial.println("Gravando Token.......");
     for( byte i=0; i < count; i++ )
       EEPROM.write( E_TOKEN+i, value[i] );
   }
-
+/*
   if( strstr(param, "ip_address") != NULL ) {
-    for( byte i=0; i < count; i++ )
-      EEPROM.write( E_IP+i, value[i] );
+    byte tmp; byte j = 2;
+    for( byte i=0; i < count; i++ ){
+      if( value[i] == '.' ) {
+        EEPROM.write( E_IP+i, ( (uint8_t) tmp ) );
+      } else {
+        tmp += ( (byte) value[i] ) * pow(10, j) ;
+        j--;
+      }
+    }
   }
 
   if( strstr(param, "mac_address") != NULL ) {
@@ -155,19 +165,19 @@ void write_data_to_eeprom( const char* param, const char* value ){
     for( byte i=0; i < count; i++ )
       EEPROM.write( E_MASK+i, value[i] );
   }
+*/
 
 }
 
 void processing_action(const char *post_data, const char *filename) {
   Serial.println("Processando POST................");
 
-  byte count = strlen(post_data);
   byte j, k = 0;
   char param[8] = ""; // 0 - 7
-  char value[100] = ""; // max 100
+  char value[20] = ""; // max 100
   boolean p = true;
 
-  for( byte i=0; count; i++ ) {
+  for( byte i=0; strlen(post_data); i++ ) {
 
     if ( post_data[i] != '&' && post_data[i] != '=' ) {
 
@@ -179,9 +189,12 @@ void processing_action(const char *post_data, const char *filename) {
     } else {
 
       if( post_data[i] == '&' ) {
+        param[j] = 0;
+        value[k] = 0;
         p = true;
         j =0; k = 0;
 
+        Serial.println("Colocando dados na EEPROM.............");
         write_data_to_eeprom(param, value);
       } else {
         p = false;

@@ -4,7 +4,7 @@
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 192, 168, 1, 200 };
 Server server(80);
-#define HTTP_HEADER_SIZE 254
+#define HTTP_HEADER_SIZE 200
 
 // posições de memória na EEPROM
 #define E_DESC     0 // 100 chars
