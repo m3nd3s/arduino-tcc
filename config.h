@@ -8,21 +8,13 @@ Server server(80);
 
 prog_char html_mime_type[] PROGMEM = "Content-Type: text/html";
 prog_char text_mime_type[] PROGMEM = "Content-Type: text";
+prog_char head_file_not_found[] PROGMEM = "HTTP/1.1 404 Not Found\nContent-Type: text/html\n\n<h2>File Not Found!</h2>";
 
 PROGMEM const char *string_table[] = {
   html_mime_type,
-  text_mime_type
+  text_mime_type,
+  head_file_not_found
 };
-
-// posições de memória na EEPROM
-#define E_DESC     0 // 100 chars
-#define E_USER   100 //  8 chars
-#define E_PASS   108 //  8 chars
-#define E_TOKEN  116 // 15 chars
-#define E_IP     131 //  4 bytes
-#define E_MAC    135 //  6 bytes
-#define E_GATEW  141 //  4 bytes
-#define E_MASK   145 //  4 bytes
 
 /********************************************************************************
  *                    RTC DS1302 CONFIGURATION

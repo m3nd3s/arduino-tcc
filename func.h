@@ -1,10 +1,7 @@
 // Método que imprime para o cliente o erro de página
 // não encontrada
 void file_not_found(Client client) {
-  client.println("HTTP/1.1 404 Not Found");
-  client.println("Content-Type: text/html");
-  client.println();
-  client.println("<h2>File Not Found!</h2>");
+  client.println((char*) pgm_read_word(string_table[2]));
 }
 
 // Determina se a requisição é do tipo GET
@@ -46,9 +43,9 @@ boolean render_html(Client client, const char *filename, boolean isGET){
 
     // Define the kind of file
     if ( strstr(filename, ".htm") != 0 )
-      client.println((char*) pgm_read_dword(string_table[0]));
+      client.println((char*) pgm_read_word(string_table[0]));
     else
-      client.println((char*) pgm_read_dword(string_table[0]));
+      client.println((char*) pgm_read_word(string_table[0]));
       client.println((char*) pgm_read_dword(string_table[1]));
 
     client.println();
@@ -86,9 +83,9 @@ boolean render_html(Client client, const char *filename, boolean isGET){
               client.print(current_temp);
             }
             else if(strstr(keyword, "{date}") != NULL ){ // Caso ache {date}, substitua pela data/hora atual
-              //char dt[19];
-              //sprintf(dt, "%02d-%02d-%04d %02d:%02d:%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec);
-              client.print("..");
+              char dt[20];
+              sprintf(dt, "%02d-%02d-%04d %02d:%02d:%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec);
+              client.print(dt);
             } else{
               client.print(keyword);
             }
@@ -111,98 +108,11 @@ boolean render_html(Client client, const char *filename, boolean isGET){
   return true;
 }
 
-void write_data_to_eeprom( const char* param, const char* value ){
-
-  byte count = strlen(value);
-  // Verifica o que veio do formulário
-  if( strstr(param, "description") != NULL ) {
-    for( byte i=0; i < count; i++ )
-      EEPROM.write( E_DESC+i, value[i] );
-  }
-
-  if( strstr(param, "user") != NULL ) {
-    Serial.println("Gravando Usuário.......");
-    for( byte i=0; i < count; i++ )
-      EEPROM.write( E_USER+i, value[i] );
-  }
-
-  if( strstr(param, "password") != NULL ) {
-    Serial.println("Gravando Senha.......");
-    for( byte i=0; i < count; i++ )
-      EEPROM.write( E_PASS+i, value[i] );
-  }
-
-  if( strstr(param, "token") != NULL ) {
-    Serial.println("Gravando Token.......");
-    for( byte i=0; i < count; i++ )
-      EEPROM.write( E_TOKEN+i, value[i] );
-  }
-/*
-  if( strstr(param, "ip_address") != NULL ) {
-    byte tmp; byte j = 2;
-    for( byte i=0; i < count; i++ ){
-      if( value[i] == '.' ) {
-        EEPROM.write( E_IP+i, ( (uint8_t) tmp ) );
-      } else {
-        tmp += ( (byte) value[i] ) * pow(10, j) ;
-        j--;
-      }
-    }
-  }
-
-  if( strstr(param, "mac_address") != NULL ) {
-    for( byte i=0; i < count; i++ )
-      EEPROM.write( E_MAC+i, value[i] );
-  }
-
-  if( strstr(param, "gateway") != NULL ) {
-    for( byte i=0; i < count; i++ )
-      EEPROM.write( E_GATEW+i, value[i] );
-  }
-
-  if( strstr(param, "mask") != NULL ) {
-    for( byte i=0; i < count; i++ )
-      EEPROM.write( E_MASK+i, value[i] );
-  }
-*/
-
-}
-
 void processing_action(const char *post_data, const char *filename) {
   Serial.println("Processando POST................");
 
-  byte j, k = 0;
-  char param[8] = ""; // 0 - 7
-  char value[20] = ""; // max 100
-  boolean p = true;
-
-  for( byte i=0; strlen(post_data); i++ ) {
-
-    if ( post_data[i] != '&' && post_data[i] != '=' ) {
-
-      if( p )
-        param[j++] = post_data[i]; 
-      else
-        value[k++] = post_data[i];
-
-    } else {
-
-      if( post_data[i] == '&' ) {
-        param[j] = 0;
-        value[k] = 0;
-        p = true;
-        j =0; k = 0;
-
-        Serial.println("Colocando dados na EEPROM.............");
-        write_data_to_eeprom(param, value);
-      } else {
-        p = false;
-      }
-    }
-  }
-
   // Processando os dados enviados e salvando no arquivo
-  /*if ( sd_file.open(&sd_root, "config.ard", O_CREAT | O_APPEND | O_WRITE ) ) {
+  if ( sd_file.open(&sd_root, "config.ard", O_CREAT | O_WRITE ) ) {
     byte t = strlen(post_data);
     for ( byte i=0; i < t; i++ ){
       if ( post_data[i] != '&' ) {
@@ -212,7 +122,8 @@ void processing_action(const char *post_data, const char *filename) {
       }
     }
    sd_file.close();
-  }*/
+  }
+
   Serial.println("Acabou o processamento.............");
 
  }
