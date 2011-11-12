@@ -1,7 +1,7 @@
 // Método que imprime para o cliente o erro de página
 // não encontrada
 void file_not_found(Client client) {
-  client.println((char*) pgm_read_word(string_table[2]));
+  client.println((char*) pgm_read_word( &(string_table[1]) ));
 }
 
 // Determina se a requisição é do tipo GET
@@ -12,7 +12,11 @@ boolean isGET(const char* _header){
 // Rederiza corretamente a requisção do cliente.
 // Lê o arquivo correspondente no cartão SD
 boolean render_html(Client client, const char *filename, boolean isGET){
-  boolean isCSV = false;
+  boolean is_json = false;
+
+  // Get temperature and time
+  float current_temp = sensors.getTempCByIndex(0);
+  char dt[30];
   
   // Identifica se foi passado algum arquivo, caso contrário
   // carregue o index.htm
@@ -23,13 +27,10 @@ boolean render_html(Client client, const char *filename, boolean isGET){
   if ( strlen(filename) == 0 )
     filename = "index.htm";
   else
-    isCSV = ( strstr(filename, "getTemperature") != 0 && strstr(filename, "?token=1qaz2wsx") != 0 );
+    is_json = ( strstr(filename, "get_temp") != 0 && strstr(filename, "?token=1qaz2wsx") != 0 );
 
-  // Get temperature and time
-  float current_temp = sensors.getTempCByIndex(0);
-  
   // Requisição de arquivo normal
-  if ( !isCSV) {
+  if ( !is_json) {
     // Tenta abrir o arquivo para leitura
     Serial.print("Lendo arquivo: ");
     Serial.println(filename);
@@ -43,10 +44,9 @@ boolean render_html(Client client, const char *filename, boolean isGET){
 
     // Define the kind of file
     if ( strstr(filename, ".htm") != 0 )
-      client.println((char*) pgm_read_word(string_table[0]));
+      client.println((char*) pgm_read_word( &(string_table[0]) ));
     else
-      client.println((char*) pgm_read_word(string_table[0]));
-      client.println((char*) pgm_read_dword(string_table[1]));
+      client.println((char*) pgm_read_word( &(string_table[1]) ));
 
     client.println();
 
@@ -82,8 +82,7 @@ boolean render_html(Client client, const char *filename, boolean isGET){
             if ( strstr(keyword, "{temp}") != NULL ) {
               client.print(current_temp);
             }
-            else if(strstr(keyword, "{date}") != NULL ){ // Caso ache {date}, substitua pela data/hora atual
-              char dt[20];
+            else if(strstr(keyword, "{date}") != NULL ) { // Caso ache {date}, substitua pela data/hora atual
               sprintf(dt, "%02d-%02d-%04d %02d:%02d:%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec);
               client.print(dt);
             } else{
@@ -102,7 +101,9 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     sd_file.close(); // fecha o arquivo
 
   } else {
-    //client.println(csv);
+    int dec = (current_temp - ((int)current_temp)) * 100;
+    sprintf(dt, "%02d.%02d", (int)current_temp, dec);
+    client.println(dt);
   }
 
   return true;
@@ -116,6 +117,7 @@ void processing_action(const char *post_data, const char *filename) {
     byte t = strlen(post_data);
     for ( byte i=0; i < t; i++ ) {
       if ( post_data[i] != '&' ) {
+        if( post_data[i] == '%' )
         sd_file.print(post_data[i]);
       } else {
         sd_file.println();
@@ -137,7 +139,7 @@ void processing_request( Client client ) {
     char header[HTTP_HEADER_SIZE];
     boolean isGET = true;
     const char *filename;
-    char html_filename[12];
+    char html_filename[30];
 
     // Cliente conectado?
     if ( client.connected() ){

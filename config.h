@@ -10,7 +10,8 @@ prog_char html_mime_type[] PROGMEM = "Content-Type: text/html";
 prog_char text_mime_type[] PROGMEM = "Content-Type: text";
 prog_char head_file_not_found[] PROGMEM = "HTTP/1.1 404 Not Found\nContent-Type: text/html\n\n<h2>File Not Found!</h2>";
 
-PROGMEM const char *string_table[] = {
+//PROGMEM const char *string_table[] = {
+PGM_P string_table[] PROGMEM = {
   html_mime_type,
   text_mime_type,
   head_file_not_found
