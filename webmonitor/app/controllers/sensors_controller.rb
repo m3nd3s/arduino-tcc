@@ -21,4 +21,13 @@ class SensorsController < ApplicationController
     end
   end
 
+  def destroy
+    @sensor = Sensor.find( params[:id] )
+    @sensor.destroy
+    flash[:notice] = "Sensor removido com sucesso!"
+    respond_to do |format|
+      format.html { redirect_to sensors_path }
+    end
+  end
+
 end

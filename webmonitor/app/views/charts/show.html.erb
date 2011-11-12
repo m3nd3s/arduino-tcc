@@ -65,5 +65,14 @@
 </div>
 
 <div class="row">
+    <div class="actions">
+      <%= form_tag charts_path do %>
+        <%= collection_select nil, :sensor, Sensor.all, :id, :description, :include_blank => "Selecione o Dispositivo" %>
+        <%= text_field_tag :blah, nil, :placeholder => "Data/Hora Início", :class => "small" %>
+        <%= text_field_tag :blah, nil, :placeholder => "Data/Hora Fim", :class => "small" %>
+        <%= submit_tag "Filtrar", :class => "btn primary" %>
+      <% end %>
+    </div>
+
   <div id="container" style="width: 100%; height: 400px"></div>
 </div>

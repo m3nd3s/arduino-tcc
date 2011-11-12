@@ -20,7 +20,7 @@
         <td><%= s.description %></td>
         <td><%= s.alert %></td>
         <td>
-          <%= link_to "R", sensors_path(s), :method => :delete, :confirm => "Está certo disto?", :class => "btn danger" %>
+          <%= link_to "R", sensor_path(s), :method => :delete, :confirm => "Está certo disto?", :class => "btn danger" %>
           <%= link_to "E", edit_sensor_path(s), :class => "btn success" %>
         </td>
       </tr>
