@@ -1,5 +1,15 @@
-Webserver::Webserver() {
-  server(80);
+#include "Webserver.h"
+
+Webserver::Webserver(): 
+  server(80),
+  client(255)
+{
+  Serial.begin(9600);
+#define error(s) error_P(PSTR(s))
+
+  if (!sd_card.init(SPI_HALF_SPEED, SD_SS_PIN)) error("card.init failed!");
+  if (!sd_volume.init(&sd_card)) error("vol.init failed!");
+  if (!sd_root.openRoot(&sd_volume)) error("openRoot failed");
 }
 
 void Webserver::begin(){
@@ -9,6 +19,9 @@ void Webserver::begin(){
 void Webserver::process_connection(){
   // Variável de buffer, usada apenas para pegar os dados de request
   char request[HTTP_REQUEST_SIZE];
+  char c;
+  byte index = 0;
+  char *filename;
 
   // Aguarda por conexões do cliente
   client = server.available(); 
@@ -20,14 +33,14 @@ void Webserver::process_connection(){
       // Monta a string com os dados da requisição
       if ( c != '\n' && c != '\r' ) {
 
-        if( index < HTTP_HEADER_SIZE )
-          request++ = c;
+        if( index < HTTP_REQUEST_SIZE )
+          request[index++] = c;
 
       } else {
 
         if( c == '\r' ) {
           // Finaliza a string em request
-          request = 0;
+          request[index] = 0;
 
           // Checa se é GET ou POST, isto só acontece na primeira linha do cabeçalho
           if( strstr( request, "GET" ) || strstr(request, "POST") ) {
@@ -35,13 +48,10 @@ void Webserver::process_connection(){
             is_post = ( strstr( request, "POST" ) != NULL );
 
             // Captura o path/arquivo
-            if ( is_post )
-              request + 6
-            else
-              request + 5;
+            filename = ( is_post ) ? ( request + 6 ) : ( request + 5 );
 
             (strstr(request, " HTTP/1."))[0] = 0;
-            strcpy(path, request);
+            strcpy(path, filename);
           }
 
         }
@@ -116,9 +126,9 @@ bool Webserver::render() {
   // sendo realizada pelo servidor linux e valida a requisição por 
   // meio do token
   if ( strlen(path) == 0 )
-    path = "index.htm";
+    strcpy(path, "index.htm");
   else
-    is_json = ( strstr(filename, "get_json") != 0 && strstr(filename, "?token=1qaz2wsx") != 0 );
+    is_json = ( strstr(path, "get_json") != 0 && strstr(path, "?token=1qaz2wsx") != 0 );
 
   // Get temperature and time
   //float current_temp = sensors.getTempCByIndex(0);
@@ -137,7 +147,7 @@ bool Webserver::render() {
     client.println("HTTP/1.1 200 OK");
 
     // Define the kind of file
-    if ( strstr(filename, ".htm") != 0 )
+    if ( strstr(path, ".htm") != 0 )
       client.println("Content-Type: text/html");
     else
       client.println("Content-Type: text");
@@ -159,10 +169,10 @@ bool Webserver::render() {
       if ( capture ) {
 
         // Captura o caracter e incrementa o contador
-        keyword++ = _c;
+        keyword[i++] = _c;
         
         if ( i == 7 ) {
-          keyword = 0;
+          keyword[i] = 0;
           client.print(keyword);
           i = 0;
           capture = false;
@@ -198,3 +208,18 @@ bool Webserver::render() {
   return true;
 
 }
+
+// função para disparar erro de leitura com o SD Card
+void Webserver::error_P(const char* str) {
+    PgmPrint("error: ");
+    SerialPrintln_P(str);
+    if (sd_card.errorCode()) {
+        PgmPrint("SD error: ");
+        Serial.print(sd_card.errorCode(), HEX);
+        Serial.print(',');
+        Serial.println(sd_card.errorData(), HEX);
+    }
+    while(1);
+}
+
+

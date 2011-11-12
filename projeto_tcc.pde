@@ -4,22 +4,33 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <DS1302.h>
-#include <SD.h>
 #include <EEPROM.h>
+#include <SD.h>
 
 // Configurações
 #include "config.h"
 
+// Função chamada quando um alarme é ativado nos sensores de temperatura
+void alarm_handler(uint8_t* device_address) {
+  Serial.println("ALARM!!!!");
+  float t = sensors.getTempCByIndex(0);
+  digitalWrite(LED_PIN, HIGH);
+  tone(BUZZ_PIN, 10, 5000);
+}
+
+
 // Incluindo funções de uso
-#include "func.h"
+#include "Webserver.h"
+
+Webserver webserver = Webserver();
 
 // Arduino Setup
 void setup(){
   // Beginning the services
   Ethernet.begin(mac, ip);
-  server.begin();
+  webserver.begin();
+
   sensors.begin();
-  Serial.begin(9600);
 
   // Set led mode
   pinMode(LED_PIN, OUTPUT);
@@ -59,9 +70,11 @@ void setup(){
   pinMode(W5100_PIN, OUTPUT);
   digitalWrite(W5100_PIN, HIGH);
   
+  /*
   if (!sd_card.init(SPI_HALF_SPEED, SD_SS_PIN)) error("card.init failed!");
   if (!sd_volume.init(&sd_card)) error("vol.init failed!");
   if (!sd_root.openRoot(&sd_volume)) error("openRoot failed");
+  */
 }
 
 void loop(){
@@ -86,9 +99,6 @@ void loop(){
   }
 
   // listen for incoming clients
-  Client client = server.available();
+  webserver.process_connection();
 
-  if ( client ) {
-      processing_request(client);
-  }
 }

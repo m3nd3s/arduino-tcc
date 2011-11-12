@@ -4,7 +4,6 @@
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 192, 168, 1, 200 };
 Server server(80);
-#define HTTP_HEADER_SIZE 200
 
 // posições de memória na EEPROM
 #define E_DESC     0 // 100 chars
@@ -50,13 +49,10 @@ DeviceAddress thermometer;
 /********************************************************************************
  *                  SD CARD CONFIGURATION
  ********************************************************************************/
+/*
 #define error(s) error_P(PSTR(s))
 #define SD_SS_PIN 4
 #define W5100_PIN 10
-Sd2Card sd_card;
-SdVolume sd_volume;
-SdFile sd_root;
-SdFile sd_file;
 char log_filename[8] = "log.ard";
 
 // função para disparar erro de leitura com o SD Card
@@ -71,3 +67,4 @@ void error_P(const char* str) {
     }
     while(1);
 }
+*/
