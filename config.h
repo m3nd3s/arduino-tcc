@@ -10,7 +10,6 @@ prog_char html_mime_type[] PROGMEM = "Content-Type: text/html";
 prog_char text_mime_type[] PROGMEM = "Content-Type: text";
 prog_char head_file_not_found[] PROGMEM = "HTTP/1.1 404 Not Found\nContent-Type: text/html\n\n<h2>File Not Found!</h2>";
 
-//PROGMEM const char *string_table[] = {
 PGM_P string_table[] PROGMEM = {
   html_mime_type,
   text_mime_type,
@@ -60,6 +59,8 @@ SdFile sd_root;
 SdFile sd_file;
 char log_filename[8] = "log.ard";
 char sec_filename[8] = "sec.ard";
+char tem_filename[8] = "tem.ard";
+char tim_filename[8] = "tim.ard";
 
 // função para disparar erro de leitura com o SD Card
 void error_P(const char* str) {

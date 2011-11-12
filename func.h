@@ -1,7 +1,9 @@
 // Método que imprime para o cliente o erro de página
 // não encontrada
 void file_not_found(Client client) {
-  client.println((char*) pgm_read_word( &(string_table[1]) ));
+  char buffer[128];
+  strcpy_P( buffer, (char*) pgm_read_word( &(string_table[2]) ) );
+  client.print( buffer );
 }
 
 // Determina se a requisição é do tipo GET
@@ -12,11 +14,12 @@ boolean isGET(const char* _header){
 // Rederiza corretamente a requisção do cliente.
 // Lê o arquivo correspondente no cartão SD
 boolean render_html(Client client, const char *filename, boolean isGET){
-  boolean is_json = false;
+  byte action = 0;
 
   // Get temperature and time
   float current_temp = sensors.getTempCByIndex(0);
   char dt[30];
+  char _c;
   
   // Identifica se foi passado algum arquivo, caso contrário
   // carregue o index.htm
@@ -24,13 +27,17 @@ boolean render_html(Client client, const char *filename, boolean isGET){
   // Caso algum path tenha sido passado, é checado se a requisição está
   // sendo realizada pelo servidor linux e valida a requisição por 
   // meio do token
-  if ( strlen(filename) == 0 )
+  if ( strlen(filename) == 0 ){
     filename = "index.htm";
-  else
-    is_json = ( strstr(filename, "get_temp") != 0 && strstr(filename, "?token=1qaz2wsx") != 0 );
+  } else {
+    if ( strstr(filename, "get_temp") != 0 && strstr(filename, "?token=1qaz2wsx") != 0 )
+      action = 1;
+    else if ( strstr(filename, "get_conf") != 0 && strstr(filename, "?token=1qaz2wsx") != 0 )
+      action = 2;
+  }
 
   // Requisição de arquivo normal
-  if ( !is_json) {
+  if ( action == 0) {
     // Tenta abrir o arquivo para leitura
     Serial.print("Lendo arquivo: ");
     Serial.println(filename);
@@ -43,15 +50,18 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     client.println("HTTP/1.1 200 OK");
 
     // Define the kind of file
-    if ( strstr(filename, ".htm") != 0 )
-      client.println((char*) pgm_read_word( &(string_table[0]) ));
-    else
-      client.println((char*) pgm_read_word( &(string_table[1]) ));
+    char buffer[24];
+    if ( strstr(filename, ".htm") != 0 ){
+      strcpy_P( buffer, (char*) pgm_read_word( &(string_table[0]) ) );
+      client.println(buffer);
+    } else {
+      strcpy_P( buffer, (char*) pgm_read_word( &(string_table[1]) ) );
+      client.println(buffer);
+    }
 
     client.println();
 
     // Leitura do arquivo no cartão SD
-    char _c;
     char keyword[8] = "";
     boolean capture = false;
     byte i = 0;
@@ -100,10 +110,30 @@ boolean render_html(Client client, const char *filename, boolean isGET){
 
     sd_file.close(); // fecha o arquivo
 
-  } else {
+  } else if ( action == 1 ) {
+    // Acende o LED
+    digitalWrite(LED_PIN, HIGH);
+
     int dec = (current_temp - ((int)current_temp)) * 100;
     sprintf(dt, "%02d.%02d", (int)current_temp, dec);
     client.println(dt);
+    // Apaga o LED
+    digitalWrite(LED_PIN, LOW);
+  } else if ( action == 2 ) {
+    // Acende o LED
+    digitalWrite(LED_PIN, HIGH);
+  
+    if ( sd_file.open(&sd_root, tem_filename, O_READ ) ) {
+      while( ( _c = sd_file.read() ) > 0 ){
+        client.print(_c);
+      }
+      sd_file.close(); // fecha o arquivo
+    } else {
+      file_not_found(client);
+      delay(1);
+    }
+    // Apaga o LED
+    digitalWrite(LED_PIN, LOW);
   }
 
   return true;
@@ -112,13 +142,27 @@ boolean render_html(Client client, const char *filename, boolean isGET){
 void processing_action(const char *post_data, const char *filename) {
   Serial.println("Processando POST................");
 
+  char *config_file;
+  if ( strstr(filename, "sec.htm") != NULL )
+    config_file = sec_filename;
+  else if ( strstr(filename, "temp.htm" ) )
+    config_file = tem_filename;
+  else if ( strstr(filename, "time.htm" ) )
+    config_file = tim_filename;
+
   // Processando os dados enviados e salvando no arquivo
-  if ( sd_file.open(&sd_root, sec_filename, O_CREAT | O_WRITE ) ) {
+  if ( sd_file.open(&sd_root, config_file, O_CREAT | O_WRITE ) ) {
     byte t = strlen(post_data);
     for ( byte i=0; i < t; i++ ) {
       if ( post_data[i] != '&' ) {
-        if( post_data[i] == '%' )
-        sd_file.print(post_data[i]);
+        // Converte caracteres ASCII provenientes do protocolo HTTP
+        if( post_data[i] == '%' ) {
+          char hex[3] = { post_data[i+1], post_data[i+2], 0 };
+          sd_file.print((char)strtoul(hex, NULL, 16));
+          i += 2; // Avança duas casas
+        } else {
+          sd_file.print(post_data[i]);
+        }
       } else {
         sd_file.println();
       }
