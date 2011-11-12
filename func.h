@@ -46,15 +46,10 @@ boolean render_html(Client client, const char *filename, boolean isGET){
 
     // Define the kind of file
     if ( strstr(filename, ".htm") != 0 )
-      client.println("Content-Type: text/html");
-    else if ( strstr(filename, ".jpg") != 0 )
-      client.println("Content-Type: image/jpeg");
-    else if ( strstr(filename, ".gif") != 0 )
-      client.println("Content-Type: image/gif");
-    else if ( strstr(filename, ".png") != 0 )
-      client.println("Content-Type: image/png");
+      client.println((char*) pgm_read_dword(string_table[0]));
     else
-      client.println("Content-Type: text");
+      client.println((char*) pgm_read_dword(string_table[0]));
+      client.println((char*) pgm_read_dword(string_table[1]));
 
     client.println();
 
@@ -87,12 +82,16 @@ boolean render_html(Client client, const char *filename, boolean isGET){
             capture = false;
             // Se existe a chave {temp}, então substitua pela temperatura
             // corrente
-            if ( strstr(keyword, "{temp}") != NULL )
+            if ( strstr(keyword, "{temp}") != NULL ) {
               client.print(current_temp);
-            else if(strstr(keyword, "{date}") != NULL ) // Caso ache {date}, substitua pela data/hora atual
-              client.print("------");
-            else
+            }
+            else if(strstr(keyword, "{date}") != NULL ){ // Caso ache {date}, substitua pela data/hora atual
+              //char dt[19];
+              //sprintf(dt, "%02d-%02d-%04d %02d:%02d:%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec);
+              client.print("..");
+            } else{
               client.print(keyword);
+            }
             
             i = 0;
             memset(&keyword, '\0', 8);

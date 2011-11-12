@@ -6,6 +6,14 @@ byte ip[] = { 192, 168, 1, 200 };
 Server server(80);
 #define HTTP_HEADER_SIZE 200
 
+prog_char html_mime_type[] PROGMEM = "Content-Type: text/html";
+prog_char text_mime_type[] PROGMEM = "Content-Type: text";
+
+PROGMEM const char *string_table[] = {
+  html_mime_type,
+  text_mime_type
+};
+
 // posições de memória na EEPROM
 #define E_DESC     0 // 100 chars
 #define E_USER   100 //  8 chars

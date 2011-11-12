@@ -6,6 +6,7 @@
 #include <DS1302.h>
 #include <SD.h>
 #include <EEPROM.h>
+#include <avr/pgmspace.h>
 
 // Configurações
 #include "config.h"
