@@ -49,10 +49,10 @@ void setup(){
 
   /* Make a new time object to set the date and time */
   /* Tuesday, May 19, 2009 at 21:16:37. */
-  Time t(2011, 10, 22, 0, 0, 0, 0);
+  //Time t(2011, 11, 12, 15, 47, 40, 0);
 
   /* Set the time and date on the chip */
-  rtc.time(t);
+  //rtc.time(t);
 
   /*********************************************
   *       SD CARD

@@ -112,9 +112,9 @@ void processing_action(const char *post_data, const char *filename) {
   Serial.println("Processando POST................");
 
   // Processando os dados enviados e salvando no arquivo
-  if ( sd_file.open(&sd_root, "config.ard", O_CREAT | O_WRITE ) ) {
+  if ( sd_file.open(&sd_root, sec_filename, O_CREAT | O_WRITE ) ) {
     byte t = strlen(post_data);
-    for ( byte i=0; i < t; i++ ){
+    for ( byte i=0; i < t; i++ ) {
       if ( post_data[i] != '&' ) {
         sd_file.print(post_data[i]);
       } else {

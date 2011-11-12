@@ -58,6 +58,7 @@ SdVolume sd_volume;
 SdFile sd_root;
 SdFile sd_file;
 char log_filename[8] = "log.ard";
+char sec_filename[8] = "sec.ard";
 
 // função para disparar erro de leitura com o SD Card
 void error_P(const char* str) {
