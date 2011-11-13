@@ -166,6 +166,8 @@ void processing_action(const char *post_data, const char *filename) {
             char hex[3] = { post_data[i+1], post_data[i+2], 0 };
             sd_file.print((char)strtoul(hex, NULL, 16));
             i += 2; // Avança duas casas
+          } else if ( post_data[i] == '+' ) {
+            sd_file.print(' ');
           } else {
             sd_file.print(post_data[i]);
           }
@@ -379,6 +381,28 @@ void load_configuration() {
           }
           addr[k] = 0; // null no final
           msk[num] = atoi(addr);
+        }
+
+        // Tratamento para MacAddr
+        //
+        //sd_file.print((char)strtoul(hex, NULL, 16));
+        if( strstr( buff, "mac_address=" ) != NULL ) {
+          char hex[3];
+          byte num = 0;
+          byte k = 0;
+          char *pos = strstr(buff, "=");
+          for( byte j=1; j < strlen(pos); j++ ){
+            if( pos[j] == ':' ) {
+              hex[k] = 0; // null no final
+              mac[num++] = ( (byte) strtoul(hex, NULL, 16) );
+              k = 0;
+              memset( &hex, 0, 4 );
+            } else {
+              hex[k++] = pos[j];
+            }
+          }
+          hex[k] = 0; // null no final
+          mac[num] = ( (byte) strtoul(hex, NULL, 16) );
         }
 
 
