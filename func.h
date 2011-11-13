@@ -184,7 +184,7 @@ void processing_action(const char *post_data, const char *filename) {
     char month[3] = { (pos)[6], (pos)[7], 0 };
     // Ano
     pos = strstr( post_data, "year=");
-    char year[5] = { (pos)[5], (pos)[6], (pos)[7], (pos)[8], 0 };
+    char year[3] = { (pos)[5], (pos)[6], 0 };
     // Hour
     pos = strstr( post_data, "hour=");
     char hour[3] = { (pos)[5], (pos)[6], 0 };
@@ -195,7 +195,7 @@ void processing_action(const char *post_data, const char *filename) {
     pos = strstr( post_data, "sec=");
     char sec[3] = { (pos)[4], (pos)[5], 0 };
 
-    Time t(strtoul(year, NULL, 0), strtoul(month, NULL, 0), strtoul(date, NULL, 0), strtoul(hour, NULL, 0), strtoul(min, NULL, 0), strtoul(sec, NULL, 0), 0);
+    Time t(strtoul(year, NULL, 0)+2000, strtoul(month, NULL, 0), strtoul(date, NULL, 0), strtoul(hour, NULL, 0), strtoul(min, NULL, 0), strtoul(sec, NULL, 0), 0);
     rtc.time(t);
   }
 

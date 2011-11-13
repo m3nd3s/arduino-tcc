@@ -73,7 +73,7 @@ void loop(){
   t = rtc.time();
 
   // Minuto a minuto
-  if ( t.sec == 0 || t.sec == 30 ) {
+  if ( ( t.min % 5 ) == 0 && t.sec == 0 ) {
     Serial.println("Loggin Temperature... ");
     logger();
   }
