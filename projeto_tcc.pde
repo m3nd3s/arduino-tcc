@@ -73,12 +73,10 @@ void loop(){
   t = rtc.time();
 
   // Minuto a minuto
-/*  if ( ( t.min % 10 ) == 0 ) {
-    Serial.print("LOGGER: ");
-    Serial.println(t.sec);
+  if ( t.sec == 0 || t.sec == 30 ) {
+    Serial.println("Loggin Temperature... ");
     logger();
   }
-*/
 
   // If no sensor alarm, turn of LED and BUZZER
   if ( !sensors.hasAlarm() ) {

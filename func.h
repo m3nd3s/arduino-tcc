@@ -90,7 +90,9 @@ boolean render_html(Client client, const char *filename, boolean isGET){
             // Se existe a chave {temp}, então substitua pela temperatura
             // corrente
             if ( strstr(keyword, "{temp}") != NULL ) {
-              client.print(current_temp);
+              int dec = (current_temp - ((int)current_temp)) * 100;
+              sprintf(dt, "%02d,%02d", (int)current_temp, dec);
+              client.print(dt);
             }
             else if(strstr(keyword, "{date}") != NULL ) { // Caso ache {date}, substitua pela data/hora atual
               sprintf(dt, "%02d-%02d-%04d %02d:%02d:%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec);
@@ -248,24 +250,20 @@ void processing_request( Client client ) {
     }
 }
 
-/*
 // Grava o log no SD
 void logger() {
     // Solicita a temperatura atual
     float current_temp = sensors.getTempCByIndex(0);
     // Solicita a data/hora atual
-    char datetime[19];
-    format_datetime(datetime, false);
+    char dt[20];
+    int dec = (current_temp - ((int)current_temp)) * 100;
+    sprintf(dt, "%02d-%02d-%04d|%02d:%02d:%02d|%02d.%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec, (int)current_temp, dec);
 
     if ( sd_file.open(&sd_root, log_filename, O_CREAT | O_APPEND | O_WRITE ) ) {
-       sd_file.print(datetime);
-       sd_file.print(";");
-       sd_file.print(current_temp);
-       sd_file.println();
+       sd_file.println(dt);
        sd_file.close();
     }
 }
-*/
 
 // Função chamada quando um alarme é ativado nos sensores de temperatura
 void alarm_handler(uint8_t* device_address) {
