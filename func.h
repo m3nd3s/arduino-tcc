@@ -145,31 +145,58 @@ void processing_action(const char *post_data, const char *filename) {
   Serial.println("Processando POST................");
 
   char *config_file;
-  if ( strstr(filename, "sec.htm") != NULL )
+  bool file = true;
+
+  if ( strstr(filename, "sec.htm") != NULL ){
     config_file = sec_filename;
-  else if ( strstr(filename, "temp.htm" ) )
+  } else if ( strstr(filename, "temp.htm" ) ) {
     config_file = tem_filename;
-  else if ( strstr(filename, "time.htm" ) )
-    config_file = tim_filename;
+  } else if ( strstr(filename, "time.htm" ) ) {
+    file = false;
+  }
 
   // Processando os dados enviados e salvando no arquivo
-  if ( sd_file.open(&sd_root, config_file, O_CREAT | O_WRITE ) ) {
-    byte t = strlen(post_data);
-    for ( byte i=0; i < t; i++ ) {
-      if ( post_data[i] != '&' ) {
-        // Converte caracteres ASCII provenientes do protocolo HTTP
-        if( post_data[i] == '%' ) {
-          char hex[3] = { post_data[i+1], post_data[i+2], 0 };
-          sd_file.print((char)strtoul(hex, NULL, 16));
-          i += 2; // Avança duas casas
+  if( file ) { 
+    if ( sd_file.open(&sd_root, config_file, O_CREAT | O_WRITE ) ) {
+      byte t = strlen(post_data);
+      for ( byte i=0; i < t; i++ ) {
+        if ( post_data[i] != '&' ) {
+          // Converte caracteres ASCII provenientes do protocolo HTTP
+          if( post_data[i] == '%' ) {
+            char hex[3] = { post_data[i+1], post_data[i+2], 0 };
+            sd_file.print((char)strtoul(hex, NULL, 16));
+            i += 2; // Avança duas casas
+          } else {
+            sd_file.print(post_data[i]);
+          }
         } else {
-          sd_file.print(post_data[i]);
+          sd_file.println();
         }
-      } else {
-        sd_file.println();
       }
+     sd_file.close();
     }
-   sd_file.close();
+  } else {
+    // Data
+    char *pos = strstr( post_data, "date=" );
+    char date[3] = { (pos)[5], ( pos )[6], 0 };
+    // Mês
+    pos = strstr( post_data, "month=");
+    char month[3] = { (pos)[6], (pos)[7], 0 };
+    // Ano
+    pos = strstr( post_data, "year=");
+    char year[5] = { (pos)[5], (pos)[6], (pos)[7], (pos)[8], 0 };
+    // Hour
+    pos = strstr( post_data, "hour=");
+    char hour[3] = { (pos)[5], (pos)[6], 0 };
+    // Min
+    pos = strstr( post_data, "min=");
+    char min[3] = { (pos)[4], (pos)[5], 0 };
+    // Min
+    pos = strstr( post_data, "sec=");
+    char sec[3] = { (pos)[4], (pos)[5], 0 };
+
+    Time t(strtoul(year, NULL, 0), strtoul(month, NULL, 0), strtoul(date, NULL, 0), strtoul(hour, NULL, 0), strtoul(min, NULL, 0), strtoul(sec, NULL, 0), 0);
+    rtc.time(t);
   }
 
   Serial.println("Acabou o processamento.............");

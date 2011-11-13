@@ -3,7 +3,6 @@
         <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
         <title>Configura&ccedil;&atilde;o</title>
         <link rel="stylesheet" href="style.css" type="text/css" media="all" charset="utf-8"/>
-        <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
     </head>
 
     <body>
@@ -24,31 +23,6 @@
           <li><a href="time.htm">Data e Hora</a></li>
         </ul>
       </div>
-
-      <script type="text/javascript" language="javascript" charset="utf-8">
-      //<![CDATA[
-        $().ready(function(){
-          $("#config_form").submit(function(){
-
-            // valida o usuário
-            if ($("#username").val() == "" || $("#username").val().length < 8){
-              alert("Usuário inválido!\nDeve ter no mínimo 8 caracteres");
-              $("#username").focus();
-              return false;
-            }
-
-            // valida o usuário
-            if ($("#password").val() != $("#password_confirmation").val() ){
-              alert("A senha não confere!");
-              $("#password").focus();
-              return false;
-            }
-
-
-          });
-        });
-      //]]>
-      </script>
 
     </body>
 </html>
