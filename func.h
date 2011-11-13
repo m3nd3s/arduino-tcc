@@ -300,22 +300,45 @@ void alarm_handler(uint8_t* device_address) {
   tone(BUZZ_PIN, 10, 5000);
 }
 
-/*
 void load_configuration() {
-  char key[8];
-  char c;
-  if ( sd_file.open(&sd_root, "config.ard", O_READ ) ) {
-    byte i, j = 0;
+  Serial.println("Carregando configuracao...");
 
+  // Leitura do arquivo de configuração
+  char c;
+  if ( sd_file.open(&sd_root, sec_filename, O_READ ) ) {
+    char buff[32];
+    byte i;
     while( ( c = sd_file.read() ) > 0 ) {
-      if ( c != '=' && c != '\n' && c != '\r' ) {
-        key[i++] = c;
+      if( c != '\r' && c != '\n' ){
+        buff[i++] = c;
       } else {
-        strcpy(configuration[j], key);
-        // reset
-        memset(&key, 0, i); i = 0; j++;
+        buff[i] = 0;
+
+        // Tratamento para Endereço IP
+        if( strstr( buff, "ip_address=" ) != NULL ) {
+          char addr[4];
+          byte num = 0;
+          byte k = 0;
+          char *pos = strstr(buff, "=");
+          for( byte j=1; j < strlen(pos); j++ ){
+            if( pos[j] == '.' ) {
+              addr[k] = 0; // null no final
+              ip[num++] = atoi(addr);
+              k = 0;
+              memset( &addr, 0, 4 );
+            } else {
+              addr[k++] = pos[j];
+            }
+          }
+          addr[k] = 0; // null no final
+          ip[num] = atoi(addr);
+        }
+
+        memset(&buff, 0, 32);
+        i = 0;
       }
     }
+
+    sd_file.close();
   }
 }
-*/

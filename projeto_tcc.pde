@@ -16,9 +16,8 @@
 
 // Arduino Setup
 void setup(){
+
   // Beginning the services
-  Ethernet.begin(mac, ip);
-  server.begin();
   sensors.begin();
   Serial.begin(9600);
 
@@ -63,6 +62,14 @@ void setup(){
   if (!sd_card.init(SPI_HALF_SPEED, SD_SS_PIN)) error("card.init failed!");
   if (!sd_volume.init(&sd_card)) error("vol.init failed!");
   if (!sd_root.openRoot(&sd_volume)) error("openRoot failed");
+
+  // Load Configurations
+  load_configuration();
+
+  // Inicializa o server
+  Ethernet.begin(mac, ip);
+  server.begin();
+
 }
 
 void loop(){
