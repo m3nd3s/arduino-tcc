@@ -25,31 +25,18 @@
 
             <div class="field obligatory">
               <label for="date">*Data:</label>
-              <input type="text" name="date" id="date" value="" class="small" maxlength="2" />
+              <input type="text" name="date" id="date" value="{dd}" class="small" maxlength="2" />
               de
-              <select id="month" name="month">
-                <option value="01">Janeiro</option>
-                <option value="02">Fevereiro</option>
-                <option value="03">Mar&ccedil;o</option>
-                <option value="04">Abril</option>
-                <option value="05">Maio</option>
-                <option value="06">Junho</option>
-                <option value="07">Julho</option>
-                <option value="08">Agosto</option>
-                <option value="09">Setembro</option>
-                <option value="10">Outubro</option>
-                <option value="11">Novembro</option>
-                <option value="12">Dezembro</option>
-              </select>
+              <input type="text" name="month" id="month" value="{dm}" class="small" maxlength="2" />
               de
-              20 <input type="text" name="year" id="year" value="" class="small" maxlength="2" size="3" />
+              20 <input type="text" name="year" id="year" value="{dy}" class="small" maxlength="2" size="3" />
             </div>
 
             <div class="field obligatory">
               <label for="hour">*Hora:</label>
-              <input type="text" name="hour" id="hour" value="" class="small" maxlength="2" /> : 
-              <input type="text" name="min" id="min" value="" class="small" maxlength="2" /> :
-              <input type="text" name="sec" id="sec" value="" class="small" maxlength="2" />
+              <input type="text" name="hour" id="hour" value="{th}" class="small" maxlength="2" /> : 
+              <input type="text" name="min" id="min" value="{tm}" class="small" maxlength="2" /> :
+              <input type="text" name="sec" id="sec" value="{ts}" class="small" maxlength="2" />
             </div>
           </fieldset>
 

@@ -90,7 +90,7 @@ boolean render_html(Client client, const char *filename, boolean isGET){
             // Se existe a chave {temp}, então substitua pela temperatura
             // corrente
             if ( strstr(keyword, "{temp}") != NULL ) {
-              int dec = (current_temp - ((int)current_temp)) * 100;
+              int dec = abs(current_temp - ((int)current_temp)) * 100;
               sprintf(dt, "%02d,%02d", (int)current_temp, dec);
               client.print(dt);
             }
@@ -283,7 +283,7 @@ void logger() {
     float current_temp = sensors.getTempCByIndex(0);
     // Solicita a data/hora atual
     char dt[20];
-    int dec = (current_temp - ((int)current_temp)) * 100;
+    int dec = abs(current_temp - ((int)current_temp)) * 100;
     sprintf(dt, "%02d-%02d-%04d|%02d:%02d:%02d|%02d.%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec, (int)current_temp, dec);
 
     if ( sd_file.open(&sd_root, log_filename, O_CREAT | O_APPEND | O_WRITE ) ) {
