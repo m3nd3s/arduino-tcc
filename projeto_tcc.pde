@@ -67,7 +67,7 @@ void setup(){
   load_configuration();
 
   // Inicializa o server
-  Ethernet.begin(mac, ip);
+  Ethernet.begin(mac, ip, gw, msk);
   server.begin();
 
 }
@@ -82,7 +82,7 @@ void loop(){
   // Minuto a minuto
   if ( ( t.min % 5 ) == 0 && t.sec == 0 ) {
     Serial.println("Loggin Temperature... ");
-    logger();
+    //logger();
   }
 
   // If no sensor alarm, turn of LED and BUZZER

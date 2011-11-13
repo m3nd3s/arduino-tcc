@@ -290,6 +290,8 @@ void logger() {
        sd_file.println(dt);
        sd_file.close();
     }
+
+    delay(1);
 }
 
 // Função chamada quando um alarme é ativado nos sensores de temperatura
@@ -315,6 +317,7 @@ void load_configuration() {
         buff[i] = 0;
 
         // Tratamento para Endereço IP
+        //
         if( strstr( buff, "ip_address=" ) != NULL ) {
           char addr[4];
           byte num = 0;
@@ -333,6 +336,51 @@ void load_configuration() {
           addr[k] = 0; // null no final
           ip[num] = atoi(addr);
         }
+
+
+        // Tratamento para Gateway
+        //
+        if( strstr( buff, "gateway=" ) != NULL ) {
+          char addr[4];
+          byte num = 0;
+          byte k = 0;
+          char *pos = strstr(buff, "=");
+          for( byte j=1; j < strlen(pos); j++ ){
+            if( pos[j] == '.' ) {
+              addr[k] = 0; // null no final
+              gw[num++] = atoi(addr);
+              k = 0;
+              memset( &addr, 0, 4 );
+            } else {
+              addr[k++] = pos[j];
+            }
+          }
+          addr[k] = 0; // null no final
+          gw[num] = atoi(addr);
+        }
+
+
+        // Tratamento para Gateway
+        //
+        if( strstr( buff, "mask=" ) != NULL ) {
+          char addr[4];
+          byte num = 0;
+          byte k = 0;
+          char *pos = strstr(buff, "=");
+          for( byte j=1; j < strlen(pos); j++ ){
+            if( pos[j] == '.' ) {
+              addr[k] = 0; // null no final
+              msk[num++] = atoi(addr);
+              k = 0;
+              memset( &addr, 0, 4 );
+            } else {
+              addr[k++] = pos[j];
+            }
+          }
+          addr[k] = 0; // null no final
+          msk[num] = atoi(addr);
+        }
+
 
         memset(&buff, 0, 32);
         i = 0;
