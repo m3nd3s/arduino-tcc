@@ -300,6 +300,25 @@ void alarm_handler(uint8_t* device_address) {
   tone(BUZZ_PIN, 10, 5000);
 }
 
+void get_ip_address(char *src, byte *dst) {
+  char addr[4];
+  byte num = 0;
+  byte k = 0;
+  char *pos = strstr(src, "=");
+  for( byte j=1; j < strlen(pos); j++ ){
+    if( pos[j] == '.' ) {
+      addr[k] = 0; // null no final
+      dst[num++] = atoi(addr);
+      k = 0;
+      memset( &addr, 0, 4 );
+    } else {
+      addr[k++] = pos[j];
+    }
+  }
+  addr[k] = 0; // null no final
+  dst[num] = atoi(addr);
+}
+
 void load_configuration() {
 
   // Leitura do arquivo de configuração
@@ -317,6 +336,8 @@ void load_configuration() {
         // Tratamento para Endereço IP
         //
         if( strstr( buff, "ip_address=" ) != NULL ) {
+          get_ip_address(buff, ip);
+          /*
           char addr[4];
           byte num = 0;
           byte k = 0;
@@ -333,12 +354,15 @@ void load_configuration() {
           }
           addr[k] = 0; // null no final
           ip[num] = atoi(addr);
+          */
         }
 
 
         // Tratamento para Gateway
         //
         if( strstr( buff, "gateway=" ) != NULL ) {
+          get_ip_address(buff, gw);
+          /*
           char addr[4];
           byte num = 0;
           byte k = 0;
@@ -355,12 +379,15 @@ void load_configuration() {
           }
           addr[k] = 0; // null no final
           gw[num] = atoi(addr);
+          */
         }
 
 
         // Tratamento para Gateway
         //
         if( strstr( buff, "mask=" ) != NULL ) {
+          get_ip_address( buff, msk );
+          /*
           char addr[4];
           byte num = 0;
           byte k = 0;
@@ -377,6 +404,7 @@ void load_configuration() {
           }
           addr[k] = 0; // null no final
           msk[num] = atoi(addr);
+          */
         }
 
         // Tratamento para MacAddr
