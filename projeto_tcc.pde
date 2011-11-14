@@ -67,10 +67,8 @@ void setup(){
   load_configuration();
 
   // Inicializa o server
-  Serial.println("Inicializando a ethernet:");
   Ethernet.begin(mac, ip, gw, msk);
   server.begin();
-
 }
 
 void loop(){

@@ -11,12 +11,17 @@ Server server(80);
 prog_char html_mime_type[] PROGMEM = "Content-Type: text/html";
 prog_char text_mime_type[] PROGMEM = "Content-Type: text";
 prog_char head_file_not_found[] PROGMEM = "HTTP/1.1 404 Not Found\nContent-Type: text/html\n\n<h2>File Not Found!</h2>";
+prog_char http_200[] PROGMEM = "HTTP/1.1 200 OK";
 
 PGM_P string_table[] PROGMEM = {
   html_mime_type,
   text_mime_type,
-  head_file_not_found
+  head_file_not_found,
+  http_200
 };
+
+// Token utilizado para autenticação
+char token[10] = "";
 
 /********************************************************************************
  *                    RTC DS1302 CONFIGURATION

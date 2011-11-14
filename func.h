@@ -1,14 +1,9 @@
 // Método que imprime para o cliente o erro de página
 // não encontrada
 void file_not_found(Client client) {
-  char buffer[128];
+  char buffer[75];
   strcpy_P( buffer, (char*) pgm_read_word( &(string_table[2]) ) );
   client.print( buffer );
-}
-
-// Determina se a requisição é do tipo GET
-boolean isGET(const char* _header){
-  return strstr(_header, "GET /") != NULL;
 }
 
 // Rederiza corretamente a requisção do cliente.
@@ -29,28 +24,28 @@ boolean render_html(Client client, const char *filename, boolean isGET){
   // meio do token
   if ( strlen(filename) == 0 ){
     filename = "index.htm";
-  } else {
-    if ( strstr(filename, "get_temp") != 0 && strstr(filename, "?token=1qaz2wsx") != 0 )
-      action = 1;
-    else if ( strstr(filename, "get_conf") != 0 && strstr(filename, "?token=1qaz2wsx") != 0 )
-      action = 2;
+  } else if ( strstr(filename, "get_temp") != 0 && strstr(filename, token/*"?token=1qaz2wsx"*/) != 0 ) {
+    action = 1;
+  } else if ( strstr(filename, "get_conf") != 0 && strstr(filename, token/*"?token=1qaz2wsx"*/) != 0 ) {
+    action = 2;
+  } else if ( strstr(filename, "log.htm") != 0 ) {
+    action = 3; 
   }
 
   // Requisição de arquivo normal
   if ( action == 0) {
     // Tenta abrir o arquivo para leitura
-    Serial.print("Lendo arquivo: ");
-    Serial.println(filename);
     if ( !sd_file.open(&sd_root, filename, O_READ ) ) {
       file_not_found(client);
       delay(1); // aguarda um tempo
       return false;
     }
 
-    client.println("HTTP/1.1 200 OK");
 
-    // Define the kind of file
     char buffer[24];
+    strcpy_P( buffer, (char*) pgm_read_word( &(string_table[3]) ) );
+    client.println(buffer);
+
     if ( strstr(filename, ".htm") != 0 ){
       strcpy_P( buffer, (char*) pgm_read_word( &(string_table[0]) ) );
       client.println(buffer);
@@ -136,13 +131,22 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     }
     // Apaga o LED
     digitalWrite(LED_PIN, LOW);
+  } else if ( action == 3 ){
+    // Exibe o arquivo de logs
+    if ( sd_file.open(&sd_root, log_filename, O_READ ) ) {
+      while( ( _c = sd_file.read() ) > 0 )
+        if ( _c == '\n' )
+          client.print("<br />");
+        else
+          client.print(_c);
+      sd_file.close();
+    }
   }
 
   return true;
 }
 
 void processing_action(const char *post_data, const char *filename) {
-  Serial.println("Processando POST................");
 
   char *config_file;
   bool file = true;
@@ -200,8 +204,6 @@ void processing_action(const char *post_data, const char *filename) {
     Time t(strtoul(year, NULL, 0)+2000, strtoul(month, NULL, 0), strtoul(date, NULL, 0), strtoul(hour, NULL, 0), strtoul(min, NULL, 0), strtoul(sec, NULL, 0), 0);
     rtc.time(t);
   }
-
-  Serial.println("Acabou o processamento.............");
 
  }
 
@@ -262,14 +264,9 @@ void processing_request( Client client ) {
       // Caso a requisição seja do tipo POST deve ser feito o processamento da requisição
       if ( !isGET ) {
         // Debug, remover isto
-        Serial.print("POST DATA: ");
-        Serial.println(header);
         processing_action(header, html_filename);
       }
       
-      Serial.print("FILE: ");
-      Serial.println(html_filename);
-
       // Renderiza o html
       render_html(client, html_filename, isGET);
 
@@ -298,25 +295,25 @@ void logger() {
 
 // Função chamada quando um alarme é ativado nos sensores de temperatura
 void alarm_handler(uint8_t* device_address) {
-  Serial.println("ALARM!!!!");
   float t = sensors.getTempCByIndex(0);
   digitalWrite(LED_PIN, HIGH);
   tone(BUZZ_PIN, 10, 5000);
 }
 
 void load_configuration() {
-  Serial.println("Carregando configuracao...");
 
   // Leitura do arquivo de configuração
-  char c;
   if ( sd_file.open(&sd_root, sec_filename, O_READ ) ) {
-    char buff[32];
+    char buff[35];
+    char c;
     byte i;
     while( ( c = sd_file.read() ) > 0 ) {
+Serial.print(c);
       if( c != '\r' && c != '\n' ){
         buff[i++] = c;
       } else {
         buff[i] = 0;
+        i = 0;
 
         // Tratamento para Endereço IP
         //
@@ -405,12 +402,24 @@ void load_configuration() {
           mac[num] = ( (byte) strtoul(hex, NULL, 16) );
         }
 
+        // Pega o token
+        if( strstr( buff, "token=" ) != NULL ) {
+          byte k = 0;
+          char *pos = strstr(buff, "=");
+          for( byte j=1; j < strlen(pos); j++ ){
+            token[k++] = pos[j];
+          }
+          Serial.println("TOKEN: ");
+          Serial.println(token);
 
-        memset(&buff, 0, 32);
-        i = 0;
+        }
+
+        memset( buff, 0, 35 );
       }
     }
 
     sd_file.close();
   }
+
+Serial.println("Terminou a leitura do conf.");
 }
