@@ -308,7 +308,6 @@ void load_configuration() {
     char c;
     byte i;
     while( ( c = sd_file.read() ) > 0 ) {
-Serial.print(c);
       if( c != '\r' && c != '\n' ){
         buff[i++] = c;
       } else {

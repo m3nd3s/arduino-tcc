@@ -93,16 +93,16 @@
         $().ready(function(){
           $("#config_form").submit(function(){
 
-            // valida o usuário
+            // valida o usuario
             if ($("#username").val() == "" || $("#username").val().length < 8){
-              alert("Usuário inválido!\nDeve ter no mínimo 8 caracteres");
+              alert("Usuario invalido!\nDeve ter no minimo 8 caracteres");
               $("#username").focus();
               return false;
             }
 
-            // valida o usuário
+            // valida o usuario
             if ($("#password").val() != $("#password_confirmation").val() ){
-              alert("A senha não confere!");
+              alert("A senha nao confere!");
               $("#password").focus();
               return false;
             }
