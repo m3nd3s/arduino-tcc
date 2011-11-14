@@ -25,15 +25,25 @@ void setup(){
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUZZ_PIN, OUTPUT);
 
+  /********************************************
+  * Inicializa o SD e carrega as configurações
+  *********************************************/
+  if (!sd_card.init(SPI_HALF_SPEED, SD_SS_PIN)) error("card.init failed!");
+  if (!sd_volume.init(&sd_card)) error("vol.init failed!");
+  if (!sd_root.openRoot(&sd_volume)) error("openRoot failed");
+
+  // Load Configurations
+  load_configuration();
+
   /*********************************************
   *         DS18S20 - Thermometer
   **********************************************/
   // Thermometer address
   sensors.getAddress(thermometer, 0);
-  // alarm when temp is higher than 28C
-  sensors.setHighAlarmTemp(thermometer, MAX_TEMPERATURE);
-  // alarm when temp is lower than 19C
-  sensors.setLowAlarmTemp(thermometer, MIN_TEMPERATURE); 
+  // alarm when temp is high
+  sensors.setHighAlarmTemp(thermometer, max_temperature);
+  // alarm when temp is low
+  sensors.setLowAlarmTemp(thermometer, min_temperature); 
   // set alarm handle
   sensors.setAlarmHandler(&alarm_handler);
 
@@ -59,13 +69,6 @@ void setup(){
   pinMode(W5100_PIN, OUTPUT);
   digitalWrite(W5100_PIN, HIGH);
   
-  if (!sd_card.init(SPI_HALF_SPEED, SD_SS_PIN)) error("card.init failed!");
-  if (!sd_volume.init(&sd_card)) error("vol.init failed!");
-  if (!sd_root.openRoot(&sd_volume)) error("openRoot failed");
-
-  // Load Configurations
-  load_configuration();
-
   // Inicializa o server
   Ethernet.begin(mac, ip, gw, msk);
   server.begin();
@@ -82,6 +85,7 @@ void loop(){
   if ( ( t.min % 5 ) == 0 && t.sec == 0 ) {
     Serial.println("Loggin Temperature... ");
     //logger();
+    delay(10);
   }
 
   // If no sensor alarm, turn of LED and BUZZER

@@ -43,8 +43,10 @@ DallasTemperature sensors(&oneWire);
 DeviceAddress thermometer;
 
 // Temperaturas máximas e mínimas padrão
-#define MAX_TEMPERATURE 31
-#define MIN_TEMPERATURE 19
+//#define MAX_TEMPERATURE 31
+//#define MIN_TEMPERATURE 19
+char max_temperature = 31;
+char min_temperature = 19;
 
 
 /********************************************************************************

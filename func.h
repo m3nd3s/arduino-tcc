@@ -321,11 +321,12 @@ void get_ip_address(char *src, byte *dst) {
 
 void load_configuration() {
 
+  char buff[35];
+  char c;
+  byte i;
+
   // Leitura do arquivo de configuração
   if ( sd_file.open(&sd_root, sec_filename, O_READ ) ) {
-    char buff[35];
-    char c;
-    byte i;
     while( ( c = sd_file.read() ) > 0 ) {
       if( c != '\r' && c != '\n' ){
         buff[i++] = c;
@@ -337,24 +338,6 @@ void load_configuration() {
         //
         if( strstr( buff, "ip_address=" ) != NULL ) {
           get_ip_address(buff, ip);
-          /*
-          char addr[4];
-          byte num = 0;
-          byte k = 0;
-          char *pos = strstr(buff, "=");
-          for( byte j=1; j < strlen(pos); j++ ){
-            if( pos[j] == '.' ) {
-              addr[k] = 0; // null no final
-              ip[num++] = atoi(addr);
-              k = 0;
-              memset( &addr, 0, 4 );
-            } else {
-              addr[k++] = pos[j];
-            }
-          }
-          addr[k] = 0; // null no final
-          ip[num] = atoi(addr);
-          */
         }
 
 
@@ -362,24 +345,6 @@ void load_configuration() {
         //
         if( strstr( buff, "gateway=" ) != NULL ) {
           get_ip_address(buff, gw);
-          /*
-          char addr[4];
-          byte num = 0;
-          byte k = 0;
-          char *pos = strstr(buff, "=");
-          for( byte j=1; j < strlen(pos); j++ ){
-            if( pos[j] == '.' ) {
-              addr[k] = 0; // null no final
-              gw[num++] = atoi(addr);
-              k = 0;
-              memset( &addr, 0, 4 );
-            } else {
-              addr[k++] = pos[j];
-            }
-          }
-          addr[k] = 0; // null no final
-          gw[num] = atoi(addr);
-          */
         }
 
 
@@ -387,24 +352,6 @@ void load_configuration() {
         //
         if( strstr( buff, "mask=" ) != NULL ) {
           get_ip_address( buff, msk );
-          /*
-          char addr[4];
-          byte num = 0;
-          byte k = 0;
-          char *pos = strstr(buff, "=");
-          for( byte j=1; j < strlen(pos); j++ ){
-            if( pos[j] == '.' ) {
-              addr[k] = 0; // null no final
-              msk[num++] = atoi(addr);
-              k = 0;
-              memset( &addr, 0, 4 );
-            } else {
-              addr[k++] = pos[j];
-            }
-          }
-          addr[k] = 0; // null no final
-          msk[num] = atoi(addr);
-          */
         }
 
         // Tratamento para MacAddr
@@ -436,8 +383,6 @@ void load_configuration() {
           for( byte j=1; j < strlen(pos); j++ ){
             token[k++] = pos[j];
           }
-          Serial.println("TOKEN: ");
-          Serial.println(token);
 
         }
 
@@ -445,6 +390,49 @@ void load_configuration() {
       }
     }
 
+    sd_file.close();
+  }
+
+
+  // Leitura do arquivo de configuração de temperaturas
+  if ( sd_file.open(&sd_root, tem_filename, O_READ ) ) {
+    memset( buff, 0, 35 );
+    i = 0;
+    while( ( c = sd_file.read() ) > 0 ) {
+      if( c != '\r' && c != '\n' ){
+        buff[i++] = c;
+      } else {
+        buff[i] = 0;
+        i = 0;
+
+        // Pegando temperatura Máxima
+        //
+        if( c == '\r' && strstr( buff, "max_temperature=" ) != NULL ) {
+          byte k = 0;
+          char *pos = strstr(buff, "=");
+          char temp[3];
+          for( byte j=1; j < strlen(pos); j++ ){
+            temp[k++] = pos[j];
+          }
+          temp[k] = 0;
+          max_temperature = atoi(temp);
+        }
+
+        // Pegando temperatura Mínima
+        //
+        if( c == '\r' && strstr( buff, "min_temperature=" ) != NULL ) {
+          byte k = 0;
+          char *pos = strstr(buff, "=");
+          char temp[3];
+          for( byte j=1; j < strlen(pos); j++ ){
+            temp[k++] = pos[j];
+          }
+          temp[k] = 0;
+          min_temperature = atoi(temp);
+        }
+
+      }
+    }
     sd_file.close();
   }
 
