@@ -277,7 +277,7 @@ void processing_request( Client client ) {
         processing_action(header, html_filename);
       }
       
-      if(authenticated){
+      if(authenticated || strstr(html_filename, "get_temp") != NULL || strstr(html_filename, "get_conf") ){
         // Renderiza o html
         render_html(client, html_filename, isGET);
       } else {
