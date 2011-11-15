@@ -7,17 +7,20 @@ byte msk[] = { 255, 255, 255, 0 };
 byte gw[] = { 192, 168, 1, 1 };
 Server server(80);
 #define HTTP_HEADER_SIZE 200
+char basic_auth[32] = "YWRtaW46YWRtaW4="; // admin:admin
 
 prog_char html_mime_type[] PROGMEM = "Content-Type: text/html";
 prog_char text_mime_type[] PROGMEM = "Content-Type: text";
 prog_char head_file_not_found[] PROGMEM = "HTTP/1.1 404 Not Found\nContent-Type: text/html\n\n<h2>File Not Found!</h2>";
 prog_char http_200[] PROGMEM = "HTTP/1.1 200 OK";
+prog_char http_401[] PROGMEM = "HTTP/1.0 401 Authorization Required\r\nWWW-Authenticate: Basic realm=\"Arduino\"\r\nContent-Type: text/html\r\n\r\n<html><body><h1>401 Unauthorized.</h1></body></html>";
 
 PGM_P string_table[] PROGMEM = {
   html_mime_type,
   text_mime_type,
   head_file_not_found,
-  http_200
+  http_200,
+  http_401
 };
 
 // Token utilizado para autenticação

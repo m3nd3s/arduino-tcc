@@ -148,13 +148,13 @@ boolean render_html(Client client, const char *filename, boolean isGET){
 
 void processing_action(const char *post_data, const char *filename) {
 
-  char *config_file;
+  char config_file[8];
   bool file = true;
 
   if ( strstr(filename, "sec.htm") != NULL ){
-    config_file = sec_filename;
+    strcpy(config_file,sec_filename);
   } else if ( strstr(filename, "temp.htm" ) ) {
-    config_file = tem_filename;
+    strcpy(config_file, tem_filename);
   } else if ( strstr(filename, "time.htm" ) ) {
     file = false;
   }
@@ -162,8 +162,8 @@ void processing_action(const char *post_data, const char *filename) {
   // Processando os dados enviados e salvando no arquivo
   if( file ) { 
     if ( sd_file.open(&sd_root, config_file, O_CREAT | O_WRITE ) ) {
-      byte t = strlen(post_data);
-      for ( byte i=0; i < t; i++ ) {
+
+      for ( byte i=0; i < strlen(post_data); i++ ) {
         if ( post_data[i] != '&' ) {
           // Converte caracteres ASCII provenientes do protocolo HTTP
           if( post_data[i] == '%' ) {
@@ -217,6 +217,8 @@ void processing_request( Client client ) {
     boolean isGET = true;
     const char *filename;
     char html_filename[30];
+    char auth_basic_header[32];
+    bool authenticated = false;
 
     // Cliente conectado?
     if ( client.connected() ){
@@ -250,6 +252,14 @@ void processing_request( Client client ) {
 
               (strstr(header, " HTTP/1."))[0] = 0;
               strcpy(html_filename, filename);
+            } else if (strstr( header, "Authorization: Basic " )) {
+              byte i = 0;
+              memset(&auth_basic_header, 0, 32);
+              for( i=0; i < strlen(header); i++ )
+                auth_basic_header[i] = header[i+21];
+              auth_basic_header[i] = 0;
+              if( strcmp(auth_basic_header, basic_auth) == 0 )
+                authenticated = true;
             }
 
           }
@@ -257,7 +267,7 @@ void processing_request( Client client ) {
           // Zera o contador e limpa o array utilizado para ler o cabeçalho
           // HTTP
           index = 0;
-          memset(&header, 0, HTTP_HEADER_SIZE);
+          memset(header, 0, HTTP_HEADER_SIZE);
         }
       }
 
@@ -267,8 +277,14 @@ void processing_request( Client client ) {
         processing_action(header, html_filename);
       }
       
-      // Renderiza o html
-      render_html(client, html_filename, isGET);
+      if(authenticated){
+        // Renderiza o html
+        render_html(client, html_filename, isGET);
+      } else {
+        char buffer[160];
+        strcpy_P( buffer, (char*) pgm_read_word( &(string_table[4]) ) );
+        client.println(buffer);
+      }
 
       // Disconnect
       delay(1);
@@ -323,7 +339,10 @@ void load_configuration() {
 
   char buff[35];
   char c;
-  byte i;
+  byte i = 0;
+  byte k = 0;
+  char *pos;
+  char user_and_pass[24];
 
   // Leitura do arquivo de configuração
   if ( sd_file.open(&sd_root, sec_filename, O_READ ) ) {
@@ -360,8 +379,8 @@ void load_configuration() {
         if( strstr( buff, "mac_address=" ) != NULL ) {
           char hex[3];
           byte num = 0;
-          byte k = 0;
-          char *pos = strstr(buff, "=");
+          k = 0;
+          pos = strstr(buff, "=");
           for( byte j=1; j < strlen(pos); j++ ){
             if( pos[j] == ':' ) {
               hex[k] = 0; // null no final
@@ -378,12 +397,34 @@ void load_configuration() {
 
         // Pega o token
         if( strstr( buff, "token=" ) != NULL ) {
-          byte k = 0;
-          char *pos = strstr(buff, "=");
+          k = 0;
+          pos = strstr(buff, "=");
           for( byte j=1; j < strlen(pos); j++ ){
             token[k++] = pos[j];
           }
 
+        }
+
+        // Pega o login e senha e faz o encrypt ao final
+        if( strstr(buff, "username=") != NULL ) {
+          k = 0;
+          pos = strstr(buff, "=");
+
+          for( byte j=1; j < strlen(pos); j++ ){
+            user_and_pass[k++] = pos[j];
+          }
+          user_and_pass[k++] = ':';
+        }
+
+        // Entrando aqui já deveria ter passado pelo username
+        if( strstr(buff, "password=") != NULL ) {
+          for( byte j=1; j < strlen(pos); j++ ){
+            user_and_pass[k++] = pos[j];
+          }
+          user_and_pass[k] = 0x00;
+Serial.println(user_and_pass);
+          int error = EncodeBase64::encode(user_and_pass,strlen(user_and_pass),basic_auth,32);
+          if(error) strcpy(basic_auth,"YWRtaW46YWRtaW4="); // "admin:admin"
         }
 
         memset( buff, 0, 35 );
@@ -392,7 +433,6 @@ void load_configuration() {
 
     sd_file.close();
   }
-
 
   // Leitura do arquivo de configuração de temperaturas
   if ( sd_file.open(&sd_root, tem_filename, O_READ ) ) {

@@ -7,12 +7,16 @@
 #include <SD.h>
 #include <EEPROM.h>
 #include <avr/pgmspace.h>
+#include <EncodeBase64.h>
 
 // Configurações
 #include "config.h"
 
 // Incluindo funções de uso
 #include "func.h"
+
+// Usada para controlar o logger
+//byte control_sec = 70;
 
 // Arduino Setup
 void setup(){
@@ -82,10 +86,10 @@ void loop(){
   t = rtc.time();
 
   // Minuto a minuto
-  if ( ( t.min % 5 ) == 0 && t.sec == 0 ) {
-    Serial.println("Loggin Temperature... ");
+  if ( t.sec == 0 ) {
+    //control_sec = t.sec;
+    //Serial.println("Loggin Temperature... ");
     //logger();
-    delay(10);
   }
 
   // If no sensor alarm, turn of LED and BUZZER
