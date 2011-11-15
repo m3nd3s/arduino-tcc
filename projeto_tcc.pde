@@ -16,7 +16,7 @@
 #include "func.h"
 
 // Usada para controlar o logger
-//byte control_sec = 70;
+byte control_sec = 70;
 
 // Arduino Setup
 void setup(){
@@ -32,6 +32,9 @@ void setup(){
   /********************************************
   * Inicializa o SD e carrega as configurações
   *********************************************/
+  pinMode(W5100_PIN, OUTPUT);
+  digitalWrite(W5100_PIN, HIGH);
+  
   if (!sd_card.init(SPI_HALF_SPEED, SD_SS_PIN)) error("card.init failed!");
   if (!sd_volume.init(&sd_card)) error("vol.init failed!");
   if (!sd_root.openRoot(&sd_volume)) error("openRoot failed");
@@ -67,12 +70,6 @@ void setup(){
   /* Set the time and date on the chip */
   //rtc.time(t);
 
-  /*********************************************
-  *       SD CARD
-  **********************************************/
-  pinMode(W5100_PIN, OUTPUT);
-  digitalWrite(W5100_PIN, HIGH);
-  
   // Inicializa o server
   Ethernet.begin(mac, ip, gw, msk);
   server.begin();
