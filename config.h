@@ -40,14 +40,15 @@ DS1302 rtc(CE_PIN, IO_PIN, SCLK_PIN);
  *                  TERMOMETER DS18S20 CONFIGURATION
  ********************************************************************************/
 #define ONE_WIRE_BUS 2
-#define TEMPERATURE_PRECISION 9
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 DeviceAddress thermometer;
 
 // Temperaturas máximas e mínimas padrão
-char max_temperature = 31;
-char min_temperature = 19;
+char max_temp = 31;
+char min_temp = 19;
+char doubt[5];
+char error_c[5];
 
 byte t_intval = 1;
 
@@ -68,20 +69,14 @@ Sd2Card sd_card;
 SdVolume sd_volume;
 SdFile sd_root;
 SdFile sd_file;
-char log_filename[8] = "log.ard";
-char sec_filename[8] = "sec.ard";
-char tem_filename[8] = "tem.ard";
-char tim_filename[8] = "tim.ard";
+char log_file[8] = "log.ard";
+char sec_file[8] = "sec.ard";
+char tem_file[8] = "tem.ard";
+char tim_file[8] = "tim.ard";
 
 // função para disparar erro de leitura com o SD Card
 void error_P(const char* str) {
-    PgmPrint("error: ");
+    PgmPrint("ERR: ");
     SerialPrintln_P(str);
-    if (sd_card.errorCode()) {
-        PgmPrint("SD error: ");
-        Serial.print(sd_card.errorCode(), HEX);
-        Serial.print(',');
-        Serial.println(sd_card.errorData(), HEX);
-    }
     while(1);
 }

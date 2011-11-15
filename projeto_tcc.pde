@@ -45,9 +45,9 @@ void setup(){
   // Thermometer address
   sensors.getAddress(thermometer, 0);
   // alarm when temp is high
-  sensors.setHighAlarmTemp(thermometer, max_temperature);
+  sensors.setHighAlarmTemp(thermometer, max_temp);
   // alarm when temp is low
-  sensors.setLowAlarmTemp(thermometer, min_temperature); 
+  sensors.setLowAlarmTemp(thermometer, min_temp); 
   // set alarm handle
   sensors.setAlarmHandler(&alarm_handler);
 
@@ -93,14 +93,13 @@ void loop(){
 
   Time t = rtc.time();
   if( t.sec == 0 && ( t.min % t_intval ) == 0 ){
-    if( sd_file.open(&sd_root, log_filename, O_CREAT | O_WRITE | O_APPEND ) ) {
-      float current_temp = sensors.getTempCByIndex(0);
+    if( sd_file.open(&sd_root, log_file, O_CREAT | O_WRITE | O_APPEND ) ) {
+      float current_temp = sensors.getTempCByIndex(0) - atof( error_c );
       char buffer[25];
       byte dec = abs(current_temp - ((byte)current_temp)) * 100;
       sprintf(buffer, "%02d-%02d-%04d|%02d:%02d:%02d|%02d.%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec, (byte)current_temp, dec);
       sd_file.println(buffer);
       sd_file.close();
-      Serial.println( buffer );
       delay(500);
     }
   }

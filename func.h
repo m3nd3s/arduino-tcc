@@ -12,7 +12,7 @@ boolean render_html(Client client, const char *filename, boolean isGET){
   byte action = 0;
 
   // Get temperature and time
-  float current_temp = sensors.getTempCByIndex(0);
+  float current_temp = sensors.getTempCByIndex(0) - atof( error_c );
   char buffer[30];
   char _c;
   
@@ -37,7 +37,7 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     // Tenta abrir o arquivo para leitura
     if ( !sd_file.open(&sd_root, filename, O_READ ) ) {
       file_not_found(client);
-      delay(1); // aguarda um tempo
+      //delay(1); // aguarda um tempo
       return false;
     }
 
@@ -56,7 +56,7 @@ boolean render_html(Client client, const char *filename, boolean isGET){
 
     // Leitura do arquivo no cartão SD
     char keyword[8] = "";
-    boolean capture = false;
+    bool capture = false;
     byte i = 0;
 
     // Read file from SD Card
@@ -119,7 +119,7 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     // Acende o LED
     digitalWrite(LED_PIN, HIGH);
   
-    if ( sd_file.open(&sd_root, tem_filename, O_READ ) ) {
+    if ( sd_file.open(&sd_root, tem_file, O_READ ) ) {
       while( ( _c = sd_file.read() ) > 0 ){
         client.print(_c);
       }
@@ -132,7 +132,7 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     digitalWrite(LED_PIN, LOW);
   } else if ( action == 3 ){
     // Exibe o arquivo de logs
-    if ( sd_file.open(&sd_root, log_filename, O_READ ) ) {
+    if ( sd_file.open(&sd_root, log_file, O_READ ) ) {
       while( ( _c = sd_file.read() ) > 0 )
         if ( _c == '\n' )
           client.print("<br />");
@@ -154,9 +154,9 @@ void processing_action(char *post_data, char *filename) {
   bool file = true;
 
   if ( strstr(filename, "sec.htm") != NULL ){
-    config_file = sec_filename;
+    config_file = sec_file;
   } else if ( strstr(filename, "temp.htm" ) ) {
-    config_file = tem_filename;
+    config_file = tem_file;
   } else if ( strstr(filename, "time.htm" ) ) {
     file = false;
   }
@@ -220,7 +220,7 @@ void processing_request( Client client ) {
     char buffer[HTTP_HEADER_SIZE];
     bool isGET = true;
     const char *filename;
-    char html_filename[30];
+    char html_file[30];
     bool authenticated = false;
 
     // Cliente conectado?
@@ -254,8 +254,8 @@ void processing_request( Client client ) {
               filename = (isGET) ? ( buffer+ 5 ) : ( buffer + 6 );
 
               (strstr(buffer, " HTTP/1."))[0] = 0;
-              strcpy(html_filename, filename);
-            } else if (strstr( buffer, "Authorization: Basic " )) {
+              strcpy(html_file, filename);
+            } else if (strstr( buffer, "Basic " )) {
               char *pos = strrchr( buffer, ' ' );
               authenticated = ( strcmp(pos+1, basic_auth) == 0 );
             }
@@ -271,12 +271,12 @@ void processing_request( Client client ) {
 
       // Caso a requisição seja do tipo POST deve ser feito o processamento da requisição
       if ( !isGET ) {
-        processing_action(buffer, html_filename);
+        processing_action(buffer, html_file);
       }
       
-      if(authenticated || strstr(html_filename, "get_temp") != NULL || strstr(html_filename, "get_conf") ){
+      if(authenticated || strstr(html_file, "get_temp") != NULL || strstr(html_file, "get_conf") ){
         // Renderiza o html
-        render_html(client, html_filename, isGET);
+        render_html(client, html_file, isGET);
       } else {
         //char buffer[135];
         strcpy_P( buffer, (char*) pgm_read_word( &(string_table[4]) ) );
@@ -291,7 +291,6 @@ void processing_request( Client client ) {
 
 // Função chamada quando um alarme é ativado nos sensores de temperatura
 void alarm_handler(uint8_t* device_address) {
-  float t = sensors.getTempCByIndex(0);
   digitalWrite(LED_PIN, HIGH);
   tone(BUZZ_PIN, 10, 5000);
 }
@@ -325,7 +324,7 @@ void load_configuration() {
   char user_and_pass[24];
 
   // Leitura do arquivo de configuração
-  if ( sd_file.open(&sd_root, sec_filename, O_READ ) ) {
+  if ( sd_file.open(&sd_root, sec_file, O_READ ) ) {
     while( ( c = sd_file.read() ) > 0 ) {
       if( c != '\r' && c != '\n' ){
         buff[i++] = c;
@@ -335,23 +334,23 @@ void load_configuration() {
 
         // Tratamento para Endereço IP
         //
-        if( strstr( buff, "ip_address=" ) != NULL )
+        if( strstr( buff, "ip_addr" ) != NULL )
           get_ip_address(buff, ip);
 
         // Tratamento para Gateway
         //
-        if( strstr( buff, "gateway=" ) != NULL )
+        if( strstr( buff, "gateway" ) != NULL )
           get_ip_address(buff, gw);
 
         // Tratamento para Gateway
         //
-        if( strstr( buff, "mask=" ) != NULL ) {
+        if( strstr( buff, "mask" ) != NULL ) {
           get_ip_address( buff, msk );
         }
 
         // Tratamento para MacAddr
         //
-        if( strstr( buff, "mac_address=" ) != NULL ) {
+        if( strstr( buff, "mac_a" ) != NULL ) {
           char hex[3];
           byte num = 0;
           k = 0;
@@ -409,7 +408,7 @@ void load_configuration() {
   }
 
   // Leitura do arquivo de configuração de temperaturas
-  if ( sd_file.open(&sd_root, tem_filename, O_READ ) ) {
+  if ( sd_file.open(&sd_root, tem_file, O_READ ) ) {
     memset( buff, 0, 35 );
     i = 0;
     while( ( c = sd_file.read() ) > 0 ) {
@@ -418,30 +417,41 @@ void load_configuration() {
       } else {
         buff[i] = 0;
         i = 0;
+        byte cmd = 0;
+        if( strstr( buff, "max_temp" ) != NULL )
+          cmd = 1;
+        else if ( strstr( buff, "min_temp" ) != NULL )
+          cmd = 2;
+        else if ( strstr( buff, "interval" ) != NULL )
+          cmd = 3;
+        else if ( strstr( buff, "doubt" ) != NULL )
+          cmd = 4;
+        else if ( strstr( buff, "error" ) != NULL )
+          cmd = 5;
 
         // Pegando temperatura Máxima
         //
-        if( c == '\r' && ( strstr( buff, "max_temperature=" ) != NULL 
-                        || strstr( buff, "min_temperature=" ) != NULL 
-                        || strstr( buff, "interval=" ) != NULL ) ) {
+        if( c == '\r' && cmd >= 1 ) {
           byte k = 0;
           char *pos = strstr(buff, "=");
-          char temp[3];
+          char temp[5];
           for( byte j=1; j < strlen(pos); j++ ){
             temp[k++] = pos[j];
           }
           temp[k] = 0;
-          if( strstr( buff, "max_temperature=" ) != NULL )
-            max_temperature = atoi(temp);
-          else if( strstr( buff, "min_temperature=" ) != NULL )
-            min_temperature = atoi(temp);
-          else
+          if( cmd == 1 )
+            max_temp= atoi(temp);
+          else if( cmd == 2 )
+            min_temp = atoi(temp);
+          else if( cmd == 3 )
             t_intval = atoi(temp);
+          else if( cmd == 4 )
+            strcpy(doubt, temp);
+          else if ( cmd == 5 )
+            strcpy( error_c, temp );
         }
       }
     }
     sd_file.close();
   }
-
-  Serial.println("Terminou a leitura do conf.");
 }
