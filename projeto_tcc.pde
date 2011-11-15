@@ -97,10 +97,10 @@ void loop(){
       float current_temp = sensors.getTempCByIndex(0);
       char buffer[25];
       byte dec = abs(current_temp - ((byte)current_temp)) * 100;
-      sprintf(buffer, "%02d-%02d-%04d|%02d:%02d:%02d|%02d,%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec, (byte)current_temp, dec);
+      sprintf(buffer, "%02d-%02d-%04d|%02d:%02d:%02d|%02d.%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec, (byte)current_temp, dec);
       sd_file.println(buffer);
       sd_file.close();
-Serial.println( buffer );
+      Serial.println( buffer );
       delay(500);
     }
   }

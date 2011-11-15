@@ -421,7 +421,9 @@ void load_configuration() {
 
         // Pegando temperatura Máxima
         //
-        if( c == '\r' && strstr( buff, "max_temperature=" ) != NULL ) {
+        if( c == '\r' && ( strstr( buff, "max_temperature=" ) != NULL 
+                        || strstr( buff, "min_temperature=" ) != NULL 
+                        || strstr( buff, "interval=" ) != NULL ) ) {
           byte k = 0;
           char *pos = strstr(buff, "=");
           char temp[3];
@@ -429,22 +431,13 @@ void load_configuration() {
             temp[k++] = pos[j];
           }
           temp[k] = 0;
-          max_temperature = atoi(temp);
+          if( strstr( buff, "max_temperature=" ) != NULL )
+            max_temperature = atoi(temp);
+          else if( strstr( buff, "min_temperature=" ) != NULL )
+            min_temperature = atoi(temp);
+          else
+            t_intval = atoi(temp);
         }
-
-        // Pegando temperatura Mínima
-        //
-        if( c == '\r' && strstr( buff, "min_temperature=" ) != NULL ) {
-          byte k = 0;
-          char *pos = strstr(buff, "=");
-          char temp[3];
-          for( byte j=1; j < strlen(pos); j++ ){
-            temp[k++] = pos[j];
-          }
-          temp[k] = 0;
-          min_temperature = atoi(temp);
-        }
-
       }
     }
     sd_file.close();
