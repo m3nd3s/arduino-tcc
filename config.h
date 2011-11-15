@@ -7,13 +7,13 @@ byte msk[] = { 255, 255, 255, 0 };
 byte gw[] = { 192, 168, 1, 1 };
 Server server(80);
 #define HTTP_HEADER_SIZE 200
-char basic_auth[32] = "YWRtaW46YWRtaW4="; // admin:admin
+char basic_auth[32];
 
 prog_char html_mime_type[] PROGMEM = "Content-Type: text/html";
 prog_char text_mime_type[] PROGMEM = "Content-Type: text";
-prog_char head_file_not_found[] PROGMEM = "HTTP/1.1 404 Not Found\nContent-Type: text/html\n\n<h2>File Not Found!</h2>";
+prog_char head_file_not_found[] PROGMEM = "HTTP/1.1 404 Not Found\nContent-Type: text/html\n\nFile Not Found!";
 prog_char http_200[] PROGMEM = "HTTP/1.1 200 OK";
-prog_char http_401[] PROGMEM = "HTTP/1.0 401 Authorization Required\r\nWWW-Authenticate: Basic realm=\"Arduino\"\r\nContent-Type: text/html\r\n\r\n<html><body><h1>401 Unauthorized.</h1></body></html>";
+prog_char http_401[] PROGMEM = "HTTP/1.0 401 Authorization Required\r\nWWW-Authenticate: Basic realm=\"Arduino\"\r\nContent-Type: text/html\r\n\r\n<h1>401 Unauthorized.</h1>";
 
 PGM_P string_table[] PROGMEM = {
   html_mime_type,
@@ -24,15 +24,15 @@ PGM_P string_table[] PROGMEM = {
 };
 
 // Token utilizado para autenticação
-char token[10] = "";
+char token[10];
 
 /********************************************************************************
  *                    RTC DS1302 CONFIGURATION
  ********************************************************************************/
-uint8_t CE_PIN = 5;
-uint8_t IO_PIN = 6;
-uint8_t SCLK_PIN = 7;
-Time t;
+#define CE_PIN 5
+#define IO_PIN 6
+#define SCLK_PIN 7
+//Time t;
 DS1302 rtc(CE_PIN, IO_PIN, SCLK_PIN);
 
 
@@ -46,11 +46,10 @@ DallasTemperature sensors(&oneWire);
 DeviceAddress thermometer;
 
 // Temperaturas máximas e mínimas padrão
-//#define MAX_TEMPERATURE 31
-//#define MIN_TEMPERATURE 19
 char max_temperature = 31;
 char min_temperature = 19;
 
+byte t_intval = 1;
 
 /********************************************************************************
  *                  BUZZER AND LEDs CONFIGURATION

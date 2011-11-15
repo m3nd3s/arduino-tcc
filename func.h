@@ -1,7 +1,7 @@
 // Método que imprime para o cliente o erro de página
 // não encontrada
 void file_not_found(Client client) {
-  char buffer[75];
+  char buffer[65];
   strcpy_P( buffer, (char*) pgm_read_word( &(string_table[2]) ) );
   client.print( buffer );
 }
@@ -13,7 +13,7 @@ boolean render_html(Client client, const char *filename, boolean isGET){
 
   // Get temperature and time
   float current_temp = sensors.getTempCByIndex(0);
-  char dt[30];
+  char buffer[30];
   char _c;
   
   // Identifica se foi passado algum arquivo, caso contrário
@@ -41,8 +41,6 @@ boolean render_html(Client client, const char *filename, boolean isGET){
       return false;
     }
 
-
-    char buffer[24];
     strcpy_P( buffer, (char*) pgm_read_word( &(string_table[3]) ) );
     client.println(buffer);
 
@@ -72,26 +70,27 @@ boolean render_html(Client client, const char *filename, boolean isGET){
         // Captura o caracter e incrementa o contador
         keyword[i++] = _c;
         
+        // Já atingiu o máximo para uma palavra-chave
         if ( i == 7 ) {
-          keyword[i] = '\0';
+          keyword[i] = 0;
           client.print(keyword);
           i = 0;
           capture = false;
-          memset(&keyword, '\0', 8);
+          memset(keyword, 0, 8);
         } else {
-          // Checa se é fechamento de placeholder
+          // Checa se é fechamento de palavra-chave
           if ( _c == '}' ) {
             capture = false;
             // Se existe a chave {temp}, então substitua pela temperatura
             // corrente
             if ( strstr(keyword, "{temp}") != NULL ) {
-              int dec = abs(current_temp - ((int)current_temp)) * 100;
-              sprintf(dt, "%02d,%02d", (int)current_temp, dec);
-              client.print(dt);
-            }
-            else if(strstr(keyword, "{date}") != NULL ) { // Caso ache {date}, substitua pela data/hora atual
-              sprintf(dt, "%02d-%02d-%04d %02d:%02d:%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec);
-              client.print(dt);
+              byte dec = abs(current_temp - ((int)current_temp)) * 100;
+              sprintf(buffer, "%02d,%02d", (int)current_temp, dec);
+              client.print(buffer);
+            } else if(strstr(keyword, "{date}") != NULL ) { // Caso ache {date}, substitua pela data/hora atual
+              Time t = rtc.time();
+              sprintf(buffer, "%02d-%02d-%04d %02d:%02d:%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec);
+              client.print(buffer);
             } else{
               client.print(keyword);
             }
@@ -111,9 +110,9 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     // Acende o LED
     digitalWrite(LED_PIN, HIGH);
 
-    int dec = (current_temp - ((int)current_temp)) * 100;
-    sprintf(dt, "%02d.%02d", (int)current_temp, dec);
-    client.println(dt);
+    byte dec = (current_temp - ((int)current_temp)) * 100;
+    sprintf(buffer, "%02d.%02d", (int)current_temp, dec);
+    client.println(buffer);
     // Apaga o LED
     digitalWrite(LED_PIN, LOW);
   } else if ( action == 2 ) {
@@ -146,15 +145,18 @@ boolean render_html(Client client, const char *filename, boolean isGET){
   return true;
 }
 
-void processing_action(const char *post_data, const char *filename) {
+/*
+ * Função para processar as ações de POST
+ */
+void processing_action(char *post_data, char *filename) {
 
-  char config_file[8];
+  char *config_file;
   bool file = true;
 
   if ( strstr(filename, "sec.htm") != NULL ){
-    strcpy(config_file,sec_filename);
+    config_file = sec_filename;
   } else if ( strstr(filename, "temp.htm" ) ) {
-    strcpy(config_file, tem_filename);
+    config_file = tem_filename;
   } else if ( strstr(filename, "time.htm" ) ) {
     file = false;
   }
@@ -207,17 +209,18 @@ void processing_action(const char *post_data, const char *filename) {
 
  }
 
-// Método responsável por processar a requisição do cliente
-// retornando a página solicitada e/ou erro correspondente
+/* 
+ * Método responsável por processar a requisição do cliente
+ * retornando a página solicitada e/ou erro correspondente
+ */
 void processing_request( Client client ) {
 
     // Controle do array de chars header
     byte index = 0; // Controla o número de caracteres
-    char header[HTTP_HEADER_SIZE];
-    boolean isGET = true;
+    char buffer[HTTP_HEADER_SIZE];
+    bool isGET = true;
     const char *filename;
     char html_filename[30];
-    char auth_basic_header[32];
     bool authenticated = false;
 
     // Cliente conectado?
@@ -232,34 +235,29 @@ void processing_request( Client client ) {
         if ( c != '\n' && c != '\r' ) {
 
           if( index < HTTP_HEADER_SIZE )
-            header[index] = c;
+            buffer[index] = c;
             index++;
 
         } else {
 
-          header[index] = 0;
+          buffer[index] = 0;
 
           if( c == '\r' ) {
 
             // Checa se é GET ou POST, isto só acontece na primeira linha do cabeçalho
-            if( strstr( header, "GET" ) || strstr(header, "POST") ) {
+            if( strstr( buffer, "GET" ) || strstr(buffer, "POST") ) {
               // é GET?
-              isGET = ( strstr( header, "GET" ) != NULL );
+              isGET = ( strstr( buffer, "GET" ) != NULL );
 
               // Isto é um truque para facilitar a leitura e identificação do arquivo
               // retirado das instruções do Arduino.cc
-              filename = (isGET) ? ( header + 5 ) : ( header + 6 );
+              filename = (isGET) ? ( buffer+ 5 ) : ( buffer + 6 );
 
-              (strstr(header, " HTTP/1."))[0] = 0;
+              (strstr(buffer, " HTTP/1."))[0] = 0;
               strcpy(html_filename, filename);
-            } else if (strstr( header, "Authorization: Basic " )) {
-              byte i = 0;
-              memset(&auth_basic_header, 0, 32);
-              for( i=0; i < strlen(header); i++ )
-                auth_basic_header[i] = header[i+21];
-              auth_basic_header[i] = 0;
-              if( strcmp(auth_basic_header, basic_auth) == 0 )
-                authenticated = true;
+            } else if (strstr( buffer, "Authorization: Basic " )) {
+              char *pos = strrchr( buffer, ' ' );
+              authenticated = ( strcmp(pos+1, basic_auth) == 0 );
             }
 
           }
@@ -267,21 +265,20 @@ void processing_request( Client client ) {
           // Zera o contador e limpa o array utilizado para ler o cabeçalho
           // HTTP
           index = 0;
-          memset(header, 0, HTTP_HEADER_SIZE);
+          memset(buffer, 0, HTTP_HEADER_SIZE);
         }
       }
 
       // Caso a requisição seja do tipo POST deve ser feito o processamento da requisição
       if ( !isGET ) {
-        // Debug, remover isto
-        processing_action(header, html_filename);
+        processing_action(buffer, html_filename);
       }
       
       if(authenticated || strstr(html_filename, "get_temp") != NULL || strstr(html_filename, "get_conf") ){
         // Renderiza o html
         render_html(client, html_filename, isGET);
       } else {
-        char buffer[160];
+        //char buffer[135];
         strcpy_P( buffer, (char*) pgm_read_word( &(string_table[4]) ) );
         client.println(buffer);
       }
@@ -290,23 +287,6 @@ void processing_request( Client client ) {
       delay(1);
       client.stop();
     }
-}
-
-// Grava o log no SD
-void logger() {
-    // Solicita a temperatura atual
-    float current_temp = sensors.getTempCByIndex(0);
-    // Solicita a data/hora atual
-    char dt[20];
-    int dec = abs(current_temp - ((int)current_temp)) * 100;
-    sprintf(dt, "%02d-%02d-%04d|%02d:%02d:%02d|%02d.%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec, (int)current_temp, dec);
-
-    if ( sd_file.open(&sd_root, log_filename, O_CREAT | O_APPEND | O_WRITE ) ) {
-       sd_file.println(dt);
-       sd_file.close();
-    }
-
-    delay(1);
 }
 
 // Função chamada quando um alarme é ativado nos sensores de temperatura
@@ -355,17 +335,13 @@ void load_configuration() {
 
         // Tratamento para Endereço IP
         //
-        if( strstr( buff, "ip_address=" ) != NULL ) {
+        if( strstr( buff, "ip_address=" ) != NULL )
           get_ip_address(buff, ip);
-        }
-
 
         // Tratamento para Gateway
         //
-        if( strstr( buff, "gateway=" ) != NULL ) {
+        if( strstr( buff, "gateway=" ) != NULL )
           get_ip_address(buff, gw);
-        }
-
 
         // Tratamento para Gateway
         //
@@ -375,7 +351,6 @@ void load_configuration() {
 
         // Tratamento para MacAddr
         //
-        //sd_file.print((char)strtoul(hex, NULL, 16));
         if( strstr( buff, "mac_address=" ) != NULL ) {
           char hex[3];
           byte num = 0;
@@ -386,7 +361,7 @@ void load_configuration() {
               hex[k] = 0; // null no final
               mac[num++] = ( (byte) strtoul(hex, NULL, 16) );
               k = 0;
-              memset( &hex, 0, 4 );
+              memset( hex, 0, 4 );
             } else {
               hex[k++] = pos[j];
             }
@@ -422,7 +397,6 @@ void load_configuration() {
             user_and_pass[k++] = pos[j];
           }
           user_and_pass[k] = 0x00;
-Serial.println(user_and_pass);
           int error = EncodeBase64::encode(user_and_pass,strlen(user_and_pass),basic_auth,32);
           if(error) strcpy(basic_auth,"YWRtaW46YWRtaW4="); // "admin:admin"
         }
@@ -476,5 +450,5 @@ Serial.println(user_and_pass);
     sd_file.close();
   }
 
-Serial.println("Terminou a leitura do conf.");
+  Serial.println("Terminou a leitura do conf.");
 }
