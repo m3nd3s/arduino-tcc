@@ -6,7 +6,7 @@ class ChartsController < ApplicationController
     @sensor = Sensor.find(sensor_id)
 
     if params[:start_at].nil? || params[:start_at].empty?
-      start_at =  Time.now - 12.hours
+      start_at =  Time.now - 2.hours
     else
       start_at = Time.parse params[:start_at]
     end
