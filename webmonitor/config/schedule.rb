@@ -21,10 +21,10 @@ set :output, File.expand_path("../../log/crontab.log", __FILE__)
 # Learn more: http://github.com/javan/whenever
 #
 
-every 1.minutes do
-  runner "TemperatureMonitor.check_and_notify", :environment => :development
-end
-
-#every 5.minutes do
-#  runner "TemperatureMonitor.fetch_temperatures", :environment => :development
+#every 1.minutes do
+#  runner "TemperatureMonitor.check_and_notify", :environment => :development
 #end
+
+every 1.minutes do
+  runner "TemperatureMonitor.fetch_temperatures", :environment => :development
+end

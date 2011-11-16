@@ -8,7 +8,7 @@ module ApplicationHelper
     sc = SystemConfiguration.first
     time = sc.refresh_interval if sc
     time ||= 1
-    content_tag :meta, :'http-equiv' => "refresh", :content => time
+    "<meta http-equiv=\"refresh\" content=\"#{time * 60}\">"
   end
 
 end

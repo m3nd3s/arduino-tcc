@@ -12,7 +12,7 @@ char basic_auth[32];
 prog_char html_mime_type[] PROGMEM = "Content-Type: text/html";
 prog_char text_mime_type[] PROGMEM = "Content-Type: text";
 prog_char head_file_not_found[] PROGMEM = "HTTP/1.1 404 Not Found\nContent-Type: text/html\n\nFile Not Found!";
-prog_char http_200[] PROGMEM = "HTTP/1.1 200 OK\r\n";
+prog_char http_200[] PROGMEM = "HTTP/1.1 200 OK";
 prog_char http_401[] PROGMEM = "HTTP/1.0 401 Authorization Required\r\nWWW-Authenticate: Basic realm=\"Arduino\"\r\nContent-Type: text/html\r\n\r\n<h1>401 Unauthorized.</h1>";
 
 PGM_P string_table[] PROGMEM = {

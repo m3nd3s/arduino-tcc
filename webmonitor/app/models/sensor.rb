@@ -16,7 +16,11 @@ class Sensor < ActiveRecord::Base
     end
 
     def is_critical?(temperature)
-      not is_alert?(temperature.to_f) and ( temperature.to_f > ( max_temperature - 1 ) or temperature.to_f < ( min_temperature - 1 ) )
+      ss = SystemConfiguration.first
+      if ss
+        critical_level = ss.critical_level
+      end
+      not is_alert?(temperature.to_f) and ( temperature.to_f > ( max_temperature - critical_level.to_f ) or temperature.to_f < ( min_temperature - critical_level ) )
     end
 
     def is_normal?(temperature)

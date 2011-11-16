@@ -28,7 +28,7 @@ class TemperatureMonitor
 
       content.split("\n").each do |record|
         fields = record.strip.split("|")
-        Temperature.create( :checked_at => Date.parse("#{ fields[0] } #{ fields[1] }"), :value => fields[2], :sensor => s )
+        Temperature.create( :checked_at => Time.parse("#{ fields[0] } #{ fields[1] }"), :value => fields[2], :sensor => s )
       end
     end
     

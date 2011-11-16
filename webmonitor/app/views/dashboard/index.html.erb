@@ -10,7 +10,7 @@
   <% Sensor.all.each do |s| %>
     <% temp = s.temperature %>
   <div class="span4">
-    <a href="#"><%= image_tag_sensor(s, temp) %></a>
+    <%= link_to image_tag_sensor(s, temp), edit_sensor_path(s) %>
     <h3><%= number_to_human temp, :separator => ',', :precision => 2, :significant => false %>&ordm; C</h3>
     <p><%= s.description %></p>
   </div>

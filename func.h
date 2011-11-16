@@ -46,7 +46,7 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     strcpy_P( buffer, (char*) pgm_read_word( &(string_table[3]) ) );
     client.println(buffer);
 
-    if ( action == 0 ) {
+    if ( strstr( filename, ".htm" ) ) {
       strcpy_P( buffer, (char*) pgm_read_word( &(string_table[0]) ) );
       client.println(buffer);
     } else {
@@ -151,9 +151,9 @@ boolean render_html(Client client, const char *filename, boolean isGET){
           client.print(_c);
       sd_file.close();
       if( del ) {
-        sd_file.open(&sd_root, log_file, O_WRITE);
-        sd_file.remove();
-        sd_file.close();
+        //sd_file.open(&sd_root, log_file, O_WRITE);
+        //sd_file.remove();
+        //sd_file.close();
       }
     }
   }
