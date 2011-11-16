@@ -29,12 +29,15 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     action = 3;
     del = false;
   } else {
-    if( strstr(filename, token/*"?token=1qaz2wsx"*/) != NULL ) {
+    if( strstr(filename, token) != NULL ) {
       if ( strstr(filename, "get_temp") != NULL ) {
         action = 1;
       } else if ( strstr(filename, "get_conf") != NULL ) {
         action = 2;
-      } 
+      } else if ( strstr(filename, "get_log") != NULL ) {
+        action = 3;
+        del = true;
+      }
     }
   }
 
