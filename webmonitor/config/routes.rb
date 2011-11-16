@@ -12,7 +12,9 @@ Webmonitor::Application.routes.draw do
 
   resource :system_configurations
   resource :charts
-  resource :reports
+  resource :reports do
+    get :export
+  end
   resources :notifications
   resources :sensors
   resources :roles

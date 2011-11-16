@@ -5,17 +5,16 @@
 <div class="row">
 
     <div class="actions">
-      
-    <%= form_tag "teste" do %>
-      <%= collection_select nil, :sensor, Sensor.all, :id, :description, :include_blank => "Selecione o Dispositivo" %>
-      <%= text_field_tag :start_at, nil, :placeholder => "Data/Hora Início", :class => "small" %>
-      <%= text_field_tag :end_at, nil, :placeholder => "Data/Hora Fim", :class => "small" %>
-      <%= submit_tag "Filtrar", :class => "btn primary" %>
-    <% end %>
-  </div>
+     <%= form_tag reports_path, :method => :get do %>
+        <%= collection_select :sensor_id, nil, Sensor.all, :id, :description %>
+        <%= text_field_tag :start_at, nil, :placeholder => "Data/Hora Início", :class => "span3", :alt => "datetime" %>
+        <%= text_field_tag :end_at, nil, :placeholder => "Data/Hora Fim", :class => "span3", :alt => "datetime" %>
+        <%= submit_tag "Filtrar", :class => "btn primary" %>
+      <% end %>     
+   </div>
 
   <div class="span14">
-    <%= link_to "Exportar CSV", "#", :class => "btn success", :style => "float: right;" %>  
+    <%= link_to_function "Exportar CSV", "$('form').attr('action', '#{reports_path}' + '/export').submit(); $('form').attr('action', '#{reports_path}');" , :class => "btn success", :style => "float: right;" %>  
   </div>
   &nbsp;
 
@@ -24,19 +23,19 @@
     <table class="zebra-striped" id="temperatures_table">
       <thead>
         <tr>
-          <th>#</th>
           <th>Data/Hora</th>
           <th>Temperatura</th>
         </tr>
       </thead>
       <% @temperatures.each_with_index do |t,i| %>
         <tr>
-        <td><%= i + 1 %></td>
         <td><%= l t.checked_at, :format => :normal %></td>
         <td><%= number_to_human t.value, :precision => 2 %>&ordm; C</td>
       </tr>
     <% end %>
     </table>
+    
+    <%= will_paginate @temperatures %>
 
   </div>
 </div>

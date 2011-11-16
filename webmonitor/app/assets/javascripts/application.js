@@ -7,3 +7,12 @@
 //= require jquery
 //= require jquery_ujs
 //= require_tree .
+
+$().ready(function(){
+    // Meio Mask
+    $.mask.masks = $.extend($.mask.masks,{
+      datetime:{ mask: '39/19/9999 29:69' }
+    });
+
+    $('input:text').setMask();
+});

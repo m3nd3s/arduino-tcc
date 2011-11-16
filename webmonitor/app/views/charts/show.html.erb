@@ -4,12 +4,6 @@
 
   $().ready(function(){
 
-    // Meio Mask
-    $.mask.masks = $.extend($.mask.masks,{
-      datetime:{ mask: '39/19/9999 29:69' }
-    });
-
-    $('input:text').setMask();
     my_chart = new Highcharts.Chart({
     
       chart: {
@@ -18,11 +12,11 @@
       },
 
       title: {
-        text: 'Temperaturas'
+        text: '<%= @sensor.description %> - Temperaturas'
       },
       
       xAxis: {
-        categories: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23] 
+        categories: [<%= @temperatures.collect { |t| "'#{ t.checked_at }'" }.join(",") %>] 
       },
 
       yAxis: {
@@ -38,7 +32,7 @@
 
       tooltip: {
         formatter: function(){
-          return '<b>' + this.series.name + '</b><br />' + this.x + 'h: ' + this.y + "ºC";
+           return '<b>' + this.series.name + '</b><br />' + this.x + '<br />' + this.y + "ºC";
         }
       },
 
@@ -51,7 +45,7 @@
         borderWidth: 0
       },
 
-      series: [{ name: 'Frios', data:[<%= @temperatures_to_chart.join(",") %>]}]
+      series: [{ name: '<%= @sensor.description %>', data:[<%= @temperatures_to_chart.join(",") %>]}]
     });
       $("#current_temperature > span").load("<%= current_temperature_path %>");
   });
@@ -70,7 +64,6 @@
 <div class="page-header">
   <h1>Gr&aacute;ficos de Temperatura</h1>
 </div>
-
 <div class="row">
     <div class="actions">
       <%= form_tag charts_path, :method => :get do %>

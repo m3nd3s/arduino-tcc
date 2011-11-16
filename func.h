@@ -25,13 +25,17 @@ boolean render_html(Client client, const char *filename, boolean isGET){
   // meio do token
   if ( strlen(filename) == 0 ){
     filename = "index.htm";
-  } else if ( strstr(filename, "get_temp") != NULL && strstr(filename, token/*"?token=1qaz2wsx"*/) != NULL ) {
-    action = 1;
-  } else if ( strstr(filename, "get_conf") != NULL && strstr(filename, token/*"?token=1qaz2wsx"*/) != NULL ) {
-    action = 2;
-  } else if ( strstr(filename, "log.htm") != NULL || ( strstr(filename, "get_log") != NULL && strstr(filename, token/*"?token=1qaz2wsx"*/) ) ) {
-    del = strstr(filename, "get_log") != NULL;
-    action = 3; 
+  } else if (strstr(filename, "log.htm")) {
+    action = 3;
+    del = false;
+  } else {
+    if( strstr(filename, token/*"?token=1qaz2wsx"*/) != NULL ) {
+      if ( strstr(filename, "get_temp") != NULL ) {
+        action = 1;
+      } else if ( strstr(filename, "get_conf") != NULL ) {
+        action = 2;
+      } 
+    }
   }
 
   // Requisição de arquivo normal
@@ -60,6 +64,9 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     char keyword[8] = "";
     bool capture = false;
     byte i = 0;
+
+    // Time
+    Time t = rtc.time();
 
     // Read file from SD Card
     while( ( _c = sd_file.read() ) > 0 ) {
@@ -90,8 +97,7 @@ boolean render_html(Client client, const char *filename, boolean isGET){
               sprintf(buffer, "%02d,%02d", (int)current_temp, dec);
               client.print(buffer);
             } else if(strstr(keyword, "{date}") != NULL ) { // Caso ache {date}, substitua pela data/hora atual
-              Time t = rtc.time();
-              sprintf(buffer, "%02d-%02d-%04d %02d:%02d:%02d", t.date, t.mon, t.yr, t.hr, t.min, t.sec);
+              sprintf(buffer, "%02d-%02d-%04d %02d:%02d", t.date, t.mon, t.yr, t.hr, t.min);
               client.print(buffer);
             } else{
               client.print(keyword);
@@ -116,8 +122,8 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     client.println(buffer);
     client.println();
 
-    byte dec = (current_temp - ((int)current_temp)) * 100;
-    sprintf(buffer, "%02d.%02d", (int)current_temp, dec);
+    byte dec = (current_temp - ((byte)current_temp)) * 100;
+    sprintf(buffer, "%02d.%02d", (byte)current_temp, dec);
     client.println(buffer);
     // Apaga o LED
     digitalWrite(LED_PIN, LOW);
@@ -151,9 +157,9 @@ boolean render_html(Client client, const char *filename, boolean isGET){
           client.print(_c);
       sd_file.close();
       if( del ) {
-        //sd_file.open(&sd_root, log_file, O_WRITE);
-        //sd_file.remove();
-        //sd_file.close();
+        sd_file.open(&sd_root, log_file, O_WRITE);
+        sd_file.remove();
+        sd_file.close();
       }
     }
   }
