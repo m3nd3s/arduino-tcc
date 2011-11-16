@@ -1,103 +1,114 @@
 <html>
-    <head>
-        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
-        <title>Configura&ccedil;&atilde;o</title>
-        <link rel="stylesheet" href="style.css" type="text/css" media="all" charset="utf-8"/>
-        <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
-    </head>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <title>Configura&ccedil;&atilde;o</title>
+    <link rel="stylesheet" href="style.css" type="text/css" media="all" charset="utf-8"/>
+    <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
+  </head>
 
-    <body>
-      <!-- MENU -->
-      <ul id="nav">
-          <li><a href="index.htm">Home</a></li>
-          <li><a href="log.htm">Registros</a></li>
-          <li><a href="config.htm">Configura&ccedil;&atilde;o</a></li>
-      </ul>
-      <!-- FIM MENU -->
+  <body>
+    <!-- MENU -->
+    <ul id="nav">
+      <li><a href="index.htm">Home</a></li>
+      <li><a href="log.htm">Registros</a></li>
+      <li><a href="config.htm">Configura&ccedil;&atilde;o</a></li>
+    </ul>
+    <!-- FIM MENU -->
 
-      <div id="container">
-        <h1>Temperatura e Registro</h1>
-        <!-- FORM -->
-        <form action="temp.htm" method="POST" name="config_form" id="config_form">
+    <div id="container">
+      <h1>Temperatura e Registro</h1>
+      <!-- FORM -->
+      <form action="temp.htm" method="POST" name="config_form" id="config_form">
 
-          <fieldset>
-            <legend>Temperaturas</legend>
+        <fieldset>
+          <legend>Geral</legend>
 
-            <div class="field obligatory">
-              <label for="max_temperature">*M&aacute;xima:</label>
-              <input type="text" name="max_temperature" id="max_temperature" value="" /> <small>em &ordm;C</small>
-            </div>
-
-            <div class="field obligatory">
-              <label for="min_temperature">*M&iacute;nima:</label>
-              <input type="text" name="min_temperature" id="min_temperature" value="" /> <small>em &ordm;C</small>
-            </div>
-
-            <div class="field obligatory">
-              <label for="error_correction">Corre&ccedil;&atilde;o de Erro:</label>
-              <input type="text" name="error_correction" id="error_correction" value="" /> <small>em &ordm;C</small>
-            </div>
-
-            <div class="field obligatory">
-              <label for="doubt">Incerteza de Medi&ccedil;&atilde;o:</label>
-              <input type="text" name="doubt" id="doubt" value="" /> <small>em &ordm;C</small>
-            </div>
-
-          </fieldset>
-
-          <fieldset>
-            <legend>Arquivo de registros</legend>
-
-            <div class="field">
-              <label for="max_filesize">Tamanho:</label>
-              <input type="text" name="max_filesize" id="max_filesize" value="" />
-               <small>em Kilobytes</small>
-            </div>
-
-            <div class="field obligatory">
-              <label for="file_action">*Caso cheio:</label>
-              <select name="file_action" id="file_action">
-                <option value="s">Parar grava&ccedil;&atilde;o</option>
-                <option value="t">Truncar arquivo</option>
-              </select>
-            </div>
-
-          </fieldset>
-
-          <fieldset>
-            <legend>Per&iacute;odo</legend>
-
-            <div class="field">
-              <label for="start_at">Iniciar em:</label>
-              <input type="text" name="start_at" id="start_at" value="" />
-            </div>
-
-            <div class="field">
-              <label for="stop_at">Terminar em:</label>
-              <input type="text" name="stop_at" id="stop_at" value="" />
-            </div>
-
-            <div class="field">
-              <label for="interval">Intervalo:</label>
-              <input type="text" name="interval" id="interval" value="" /> <small>em minutos</small>
-            </div>
-
-          </fieldset>
-
-          <div id="submit">
-            <input type="submit" value="Salvar" name="salvar" /> 
-            <a href="javascript:history.back(-1);" class="btn">Voltar</a>
+          <div class="field">
+            <label for="description">Descrição:</label>
+            <input type="text" value="" id="description" name="description">
           </div>
-        </form>
-        <!-- FORM -->
-      </div>
 
-      <script type="text/javascript" language="javascript" charset="utf-8">
-      //<![CDATA[
-        $().ready(function(){
+        </fieldset>
+
+
+        <fieldset>
+          <legend>Temperaturas</legend>
+
+          <div class="field obligatory">
+            <label for="max_temperature">*M&aacute;xima:</label>
+            <input type="text" name="max_temperature" id="max_temperature" value="" /> <small>em &ordm;C</small>
+          </div>
+
+          <div class="field obligatory">
+            <label for="min_temperature">*M&iacute;nima:</label>
+            <input type="text" name="min_temperature" id="min_temperature" value="" /> <small>em &ordm;C</small>
+          </div>
+
+          <div class="field obligatory">
+            <label for="error_correction">Corre&ccedil;&atilde;o de Erro:</label>
+            <input type="text" name="error_correction" id="error_correction" value="" /> <small>em &ordm;C</small>
+          </div>
+
+          <div class="field obligatory">
+            <label for="doubt">Incerteza de Medi&ccedil;&atilde;o:</label>
+            <input type="text" name="doubt" id="doubt" value="" /> <small>em &ordm;C</small>
+          </div>
+
+        </fieldset>
+
+        <fieldset>
+          <legend>Arquivo de registros</legend>
+
+          <div class="field">
+            <label for="max_filesize">Tamanho:</label>
+            <input type="text" name="max_filesize" id="max_filesize" value="" />
+            <small>em Kilobytes</small>
+          </div>
+
+          <div class="field obligatory">
+            <label for="file_action">*Caso cheio:</label>
+            <select name="file_action" id="file_action">
+              <option value="s">Parar grava&ccedil;&atilde;o</option>
+              <option value="t">Truncar arquivo</option>
+            </select>
+          </div>
+
+        </fieldset>
+
+        <fieldset>
+          <legend>Per&iacute;odo</legend>
+
+          <div class="field">
+            <label for="start_at">Iniciar em:</label>
+            <input type="text" name="start_at" id="start_at" value="" />
+          </div>
+
+          <div class="field">
+            <label for="stop_at">Terminar em:</label>
+            <input type="text" name="stop_at" id="stop_at" value="" />
+          </div>
+
+          <div class="field">
+            <label for="interval">Intervalo:</label>
+            <input type="text" name="interval" id="interval" value="" /> <small>em minutos</small>
+          </div>
+
+        </fieldset>
+
+        <div id="submit">
+          <input type="submit" value="Salvar" name="salvar" /> 
+          <a href="javascript:history.back(-1);" class="btn">Voltar</a>
+        </div>
+      </form>
+      <!-- FORM -->
+    </div>
+
+    <script type="text/javascript" language="javascript" charset="utf-8">
+//<![CDATA[
+    $().ready(function(){
         });
-      //]]>
-      </script>
+//]]>
+    </script>
 
-    </body>
+  </body>
 </html>
