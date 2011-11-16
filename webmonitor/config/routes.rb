@@ -7,6 +7,8 @@ Webmonitor::Application.routes.draw do
   match "dashboard" => "dashboard#index", :as => :dashboard
   match "get_temperature" => "dashboard#get_temperature", :as => :get_temperature
   match "current_temperature" => "dashboard#current_temperature", :as => :current_temperature
+  
+  match "sensors/info" => "sensors#info", :as => :info_sensor
 
   resource :system_configurations
   resource :charts

@@ -1,6 +1,7 @@
 <div class="topbar">
   <div class="fill">
     <div class="container">
+      <% if user_signed_in? %>
       <%= link_to "Servidor de Dados e Monitoramento", dashboard_path, :class => "brand" %>
       <ul class="nav">
         <li class="<%= current_css(:dashboard) %>"><%= link_to "Home", dashboard_path %></li>
@@ -16,6 +17,7 @@
         </ul>
         </li>
       </ul>
+      <% end %>
     </div>
   </div>
 </div>

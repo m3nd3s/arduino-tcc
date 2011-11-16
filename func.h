@@ -15,6 +15,7 @@ boolean render_html(Client client, const char *filename, boolean isGET){
   float current_temp = sensors.getTempCByIndex(0) - atof( error_c );
   char buffer[30];
   char _c;
+  bool del = false;
   
   // Identifica se foi passado algum arquivo, caso contrário
   // carregue o index.htm
@@ -24,11 +25,12 @@ boolean render_html(Client client, const char *filename, boolean isGET){
   // meio do token
   if ( strlen(filename) == 0 ){
     filename = "index.htm";
-  } else if ( strstr(filename, "get_temp") != 0 && strstr(filename, token/*"?token=1qaz2wsx"*/) != 0 ) {
+  } else if ( strstr(filename, "get_temp") != NULL && strstr(filename, token/*"?token=1qaz2wsx"*/) != NULL ) {
     action = 1;
-  } else if ( strstr(filename, "get_conf") != 0 && strstr(filename, token/*"?token=1qaz2wsx"*/) != 0 ) {
+  } else if ( strstr(filename, "get_conf") != NULL && strstr(filename, token/*"?token=1qaz2wsx"*/) != NULL ) {
     action = 2;
-  } else if ( strstr(filename, "log.htm") != 0 ) {
+  } else if ( strstr(filename, "log.htm") != NULL || ( strstr(filename, "get_log") != NULL && strstr(filename, token/*"?token=1qaz2wsx"*/) ) ) {
+    del = strstr(filename, "get_log") != NULL;
     action = 3; 
   }
 
@@ -44,7 +46,7 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     strcpy_P( buffer, (char*) pgm_read_word( &(string_table[3]) ) );
     client.println(buffer);
 
-    if ( strstr(filename, ".htm") != 0 ){
+    if ( action == 0 ) {
       strcpy_P( buffer, (char*) pgm_read_word( &(string_table[0]) ) );
       client.println(buffer);
     } else {
@@ -110,6 +112,10 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     // Acende o LED
     digitalWrite(LED_PIN, HIGH);
 
+    strcpy_P( buffer, (char*) pgm_read_word( &(string_table[3]) ) );
+    client.println(buffer);
+    client.println();
+
     byte dec = (current_temp - ((int)current_temp)) * 100;
     sprintf(buffer, "%02d.%02d", (int)current_temp, dec);
     client.println(buffer);
@@ -119,6 +125,10 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     // Acende o LED
     digitalWrite(LED_PIN, HIGH);
   
+    strcpy_P( buffer, (char*) pgm_read_word( &(string_table[3]) ) );
+    client.println(buffer);
+    client.println();
+
     if ( sd_file.open(&sd_root, tem_file, O_READ ) ) {
       while( ( _c = sd_file.read() ) > 0 ){
         client.print(_c);
@@ -131,14 +141,20 @@ boolean render_html(Client client, const char *filename, boolean isGET){
     // Apaga o LED
     digitalWrite(LED_PIN, LOW);
   } else if ( action == 3 ){
+    strcpy_P( buffer, (char*) pgm_read_word( &(string_table[3]) ) );
+    client.println(buffer);
+    client.println();
+
     // Exibe o arquivo de logs
     if ( sd_file.open(&sd_root, log_file, O_READ ) ) {
       while( ( _c = sd_file.read() ) > 0 )
-        if ( _c == '\n' )
-          client.print("<br />");
-        else
           client.print(_c);
       sd_file.close();
+      if( del ) {
+        sd_file.open(&sd_root, log_file, O_WRITE);
+        sd_file.remove();
+        sd_file.close();
+      }
     }
   }
 
@@ -274,7 +290,7 @@ void processing_request( Client client ) {
         processing_action(buffer, html_file);
       }
       
-      if(authenticated || strstr(html_file, "get_temp") != NULL || strstr(html_file, "get_conf") ){
+      if(authenticated || strstr(html_file, "get_temp") != NULL || strstr(html_file, "get_conf") || strstr(html_file, "get_log") ){
         // Renderiza o html
         render_html(client, html_file, isGET);
       } else {

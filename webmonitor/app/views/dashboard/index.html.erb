@@ -7,23 +7,14 @@
     <h2>Dispositivos</h2>
   </div>
 
+  <% Sensor.all.each do |s| %>
+    <% temp = s.temperature %>
   <div class="span4">
-    <a href="#"><%= image_tag "arduino_red.jpg", :class => "thumbnail" %></a>
-    <h3>3,1&ordm; C</h3>
-    <p>Exemplo de dispostivo j&aacute; em alerta.</p>
+    <a href="#"><%= image_tag_sensor(s, temp) %></a>
+    <h3><%= number_to_human temp, :separator => ',', :precision => 2, :significant => false %>&ordm; C</h3>
+    <p><%= s.description %></p>
   </div>
-
-  <div class="span4">
-    <a href="#"><%= image_tag "arduino_yellow.jpg", :class => "thumbnail" %></a>
-    <h3>1,35&ordm; C</h3>
-    <p>Exemplo de dispostivo j&aacute; em zona cr&iacute;tica.</p>
-  </div>
-
-  <div class="span4">
-    <a href="#"><%= image_tag "arduino_green.jpg", :class => "thumbnail" %></a>
-    <h3>-7,0&ordm; C</h3>
-    <p>Exemplo de dispostivo normal.</p>
-  </div>
+  <% end %>
 
 </div>
 

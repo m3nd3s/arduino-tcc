@@ -1,3 +1,15 @@
+<% content_for :javascript do %>
+  <script type="text/javascript" language="javascript" charset="utf-8">
+  //<![CDATA[
+    $('.info').click(function(){
+        $.get("<%= info_sensor_path %>", { ip: $('#sensor_ip_address').val(), token: $('#sensor_token').val() }, function(data){
+          $('#sensor_max_temperature').val(data.max_temperature);
+          $('#sensor_min_temperature').val(data.min_temperature);
+        });
+    });
+  //]]>
+  </script>
+<% end %>
 <%= form_for @sensor do |f| %>
   <fieldset>
   <legend>Dispositivo</legend>
@@ -26,10 +38,13 @@
     </div>
   </div>
 
+  <%= f.hidden_field :max_temperature %>
+  <%= f.hidden_field :min_temperature %>
+
   <div class="actions">
     <%= f.submit "Salvar", :class => "btn primary" %>
     <%= button_tag "Cancelar", :type => :reset, :class => "btn" %>
-    <%= button_tag "Recarregar Informações", :type => :button, :class => "btn info" %>
+    <%= button_tag "Carregar Informações", :type => :button, :class => "btn info" %>
   </div>
 
 </fieldset>

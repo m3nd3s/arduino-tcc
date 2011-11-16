@@ -1,0 +1,4 @@
+<p>O(s) sensor(es) abaixo dispararam notifica&ccedil;&atilde;o:</p> 
+<% @sensors.each do |s| %>
+  <b><%= s[:sensor] %></b>: <%= s[:temperature] %><br />
+<% end %>
